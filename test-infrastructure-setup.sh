@@ -115,9 +115,11 @@ echo -e "${GREEN}Step 5: Creating EKS Cluster${NC}"
 echo "=========================================="
 
 # Create EKS cluster
-run_manage_command \
-    "Creating EKS cluster '${CLUSTER_NAME}'" \
-    "./manage.pl add resource \"${CLUSTER_NAME}:eks\" -e ${ENV} -p ${PROJECT} -r ${REGION}"
+for zone in "${AVAILABILITY_ZONES[@]}"; do
+    run_manage_command \
+        "Creating EKS cluster '${CLUSTER_NAME}'" \
+        "./manage.pl add resource \"${CLUSTER_NAME}:eks\" -e ${ENV} -p ${PROJECT} -r ${REGION} -z ${REGION}${zone}"
+done
 
 echo -e "${GREEN}Step 6: Verification${NC}"
 echo "=========================================="
@@ -126,17 +128,19 @@ echo -e "${BLUE}Checking created directory structure:${NC}"
 
 # Check if all expected directories were created
 EXPECTED_DIRS=(
-    "envs/${ENV}/client-vpc"
-    "envs/${ENV}/company-backend"
+    "envs/${ENV}/${PROJECT}/client-vpc"
+    "envs/${ENV}/${PROJECT}/company-backend"
     "envs/${ENV}/${PROJECT}/eks-cluster-role"
     "envs/${ENV}/${PROJECT}/eks-node-role" 
     "envs/${ENV}/${PROJECT}/eks-pod-role"
     "envs/${ENV}/${PROJECT}/${REGION}"
+    "envs/${ENV}/${PROJECT}/${REGION}/eks-cluster-security-group"
     "envs/${ENV}/${PROJECT}/${REGION}/${REGION}a"
     "envs/${ENV}/${PROJECT}/${REGION}/${REGION}b"
     "envs/${ENV}/${PROJECT}/${REGION}/${REGION}c"
-    "envs/${ENV}/${PROJECT}/${REGION}/eks-cluster-security-group"
-    "envs/${ENV}/${PROJECT}/${REGION}/${CLUSTER_NAME}"
+    "envs/${ENV}/${PROJECT}/${REGION}/${REGION}a/${CLUSTER_NAME}"
+    "envs/${ENV}/${PROJECT}/${REGION}/${REGION}b/${CLUSTER_NAME}"
+    "envs/${ENV}/${PROJECT}/${REGION}/${REGION}c/${CLUSTER_NAME}"
 )
 
 echo ""

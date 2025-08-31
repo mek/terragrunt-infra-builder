@@ -1,0 +1,32 @@
+{
+  "_metadata": {
+    "generated_by": "manual-template-creation",
+    "generated_at": "2025-08-31T14:40:00Z",
+    "resource_type": "generic",
+    "module_source": "unknown",
+    "terraform_module_analyzed": false,
+    "note": "Generic template - customize for specific resource type"
+  },
+  "template_variables": {
+    "resource_name": "{{resource_name}}",
+    "full_name": "{{full_name}}",
+    "env_name": "{{env_name}}",
+    "region_name": "{{region_name}}",
+    "zone_name": "{{zone_name}}",
+    "project_name": "{{project_name}}"
+  },
+  "module_variables": {
+    "name": {
+      "description": "Resource name",
+      "type": "string",
+      "required": true,
+      "template_suggestion": "Use {{full_name}} for consistent naming"
+    },
+    "tags": {
+      "description": "Tags to apply to resources",
+      "type": "map(string)",
+      "required": false,
+      "template_suggestion": "Standard tags are added in terragrunt.hcl"
+    }
+  }
+}

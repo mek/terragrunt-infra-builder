@@ -1,6 +1,8 @@
 # Terragrunt Infrastructure Management System - .gitignore
 # Copyright (c) 2017-2025 Mat Kovach <mek@mek.cc>
 
+envs/*
+
 #######################
 # Terraform & Terragrunt
 #######################

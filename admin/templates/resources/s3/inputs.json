@@ -1,0 +1,386 @@
+{
+   "_metadata" : {
+      "generated_at" : "2025-08-31T18:43:19Z",
+      "generated_by" : "create-resource-template.pl",
+      "module_source" : "tfr:///terraform-aws-modules/s3-bucket/aws",
+      "resource_type" : "s3",
+      "terraform_module_analyzed" : true
+   },
+   "module_variables" : {
+      "acceleration_status" : {
+         "description" : "(Optional) Sets the accelerate configuration of an existing bucket. Can be Enabled or Suspended.",
+         "required" : false,
+         "type" : "string"
+      },
+      "access_log_delivery_policy_source_accounts" : {
+         "description" : "(Optional) List of AWS Account IDs should be allowed to deliver access logs to this bucket.",
+         "required" : false,
+         "type" : "list(string)"
+      },
+      "access_log_delivery_policy_source_buckets" : {
+         "description" : "(Optional) List of S3 bucket ARNs which should be allowed to deliver access logs to this bucket.",
+         "required" : false,
+         "type" : "list(string)"
+      },
+      "access_log_delivery_policy_source_organizations" : {
+         "description" : "(Optional) List of AWS Organization IDs should be allowed to deliver access logs to this bucket.",
+         "required" : false,
+         "type" : "list(string)"
+      },
+      "acl" : {
+         "description" : "(Optional) The canned ACL to apply. Conflicts with `grant`",
+         "required" : false,
+         "type" : "string"
+      },
+      "allowed_kms_key_arn" : {
+         "description" : "The ARN of KMS key which should be allowed in PutObject",
+         "required" : false,
+         "type" : "string"
+      },
+      "analytics_configuration" : {
+         "default" : "{",
+         "description" : "Map containing bucket analytics configuration.",
+         "required" : false,
+         "type" : "any"
+      },
+      "analytics_self_source_destination" : {
+         "description" : "Whether or not the analytics source bucket is also the destination bucket.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "analytics_source_account_id" : {
+         "description" : "The analytics source account id.",
+         "required" : false,
+         "type" : "string"
+      },
+      "analytics_source_bucket_arn" : {
+         "description" : "The analytics source bucket ARN.",
+         "required" : false,
+         "type" : "string"
+      },
+      "attach_access_log_delivery_policy" : {
+         "description" : "Controls if S3 bucket should have S3 access log delivery policy attached",
+         "required" : false,
+         "type" : "bool"
+      },
+      "attach_analytics_destination_policy" : {
+         "description" : "Controls if S3 bucket should have bucket analytics destination policy attached.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "attach_cloudtrail_log_delivery_policy" : {
+         "description" : "Controls if S3 bucket should have CloudTrail log delivery policy attached",
+         "required" : false,
+         "type" : "bool"
+      },
+      "attach_deny_incorrect_encryption_headers" : {
+         "description" : "Controls if S3 bucket should deny incorrect encryption headers policy attached.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "attach_deny_incorrect_kms_key_sse" : {
+         "description" : "Controls if S3 bucket policy should deny usage of incorrect KMS key SSE.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "attach_deny_insecure_transport_policy" : {
+         "description" : "Controls if S3 bucket should have deny non-SSL transport policy attached",
+         "required" : false,
+         "type" : "bool"
+      },
+      "attach_deny_ssec_encrypted_object_uploads" : {
+         "description" : "Controls if S3 bucket should deny SSEC encrypted object uploads.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "attach_deny_unencrypted_object_uploads" : {
+         "description" : "Controls if S3 bucket should deny unencrypted object uploads policy attached.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "attach_elb_log_delivery_policy" : {
+         "description" : "Controls if S3 bucket should have ELB log delivery policy attached",
+         "required" : false,
+         "type" : "bool"
+      },
+      "attach_inventory_destination_policy" : {
+         "description" : "Controls if S3 bucket should have bucket inventory destination policy attached.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "attach_lb_log_delivery_policy" : {
+         "description" : "Controls if S3 bucket should have ALB/NLB log delivery policy attached",
+         "required" : false,
+         "type" : "bool"
+      },
+      "attach_policy" : {
+         "description" : "Controls if S3 bucket should have bucket policy attached (set to `true` to use value of `policy` as bucket policy)",
+         "required" : false,
+         "type" : "bool"
+      },
+      "attach_public_policy" : {
+         "description" : "Controls if a user defined public bucket policy will be attached (set to `false` to allow upstream to apply defaults to the bucket)",
+         "required" : false,
+         "type" : "bool"
+      },
+      "attach_require_latest_tls_policy" : {
+         "description" : "Controls if S3 bucket should require the latest version of TLS",
+         "required" : false,
+         "type" : "bool"
+      },
+      "attach_waf_log_delivery_policy" : {
+         "description" : "Controls if S3 bucket should have WAF log delivery policy attached",
+         "required" : false,
+         "type" : "bool"
+      },
+      "availability_zone_id" : {
+         "description" : "Availability Zone ID or Local Zone ID",
+         "required" : false,
+         "type" : "string"
+      },
+      "block_public_acls" : {
+         "description" : "Whether Amazon S3 should block public ACLs for this bucket.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "block_public_policy" : {
+         "description" : "Whether Amazon S3 should block public bucket policies for this bucket.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "bucket" : {
+         "description" : "(Optional, Forces new resource) The name of the bucket. If omitted, Terraform will assign a random, unique name.",
+         "required" : false,
+         "type" : "string"
+      },
+      "bucket_prefix" : {
+         "description" : "(Optional, Forces new resource) Creates a unique bucket name beginning with the specified prefix. Conflicts with bucket.",
+         "required" : false,
+         "type" : "string"
+      },
+      "control_object_ownership" : {
+         "description" : "Whether to manage S3 Bucket Ownership Controls on this bucket.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "cors_rule" : {
+         "description" : "List of maps containing rules for Cross-Origin Resource Sharing.",
+         "required" : false,
+         "type" : "any"
+      },
+      "create_bucket" : {
+         "description" : "Controls if S3 bucket should be created",
+         "required" : false,
+         "type" : "bool"
+      },
+      "create_metadata_configuration" : {
+         "description" : "Whether to create metadata configuration resource",
+         "required" : false,
+         "type" : "bool"
+      },
+      "data_redundancy" : {
+         "description" : "Data redundancy. Valid values: `SingleAvailabilityZone`",
+         "required" : false,
+         "type" : "string"
+      },
+      "expected_bucket_owner" : {
+         "description" : "The account ID of the expected bucket owner",
+         "required" : false,
+         "type" : "string"
+      },
+      "force_destroy" : {
+         "description" : "(Optional, Default:false ) A boolean that indicates all objects should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "grant" : {
+         "description" : "An ACL policy grant. Conflicts with `acl`",
+         "required" : false,
+         "type" : "any"
+      },
+      "ignore_public_acls" : {
+         "description" : "Whether Amazon S3 should ignore public ACLs for this bucket.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "intelligent_tiering" : {
+         "default" : "{",
+         "description" : "Map containing intelligent tiering configuration.",
+         "required" : false,
+         "type" : "any"
+      },
+      "inventory_configuration" : {
+         "default" : "{",
+         "description" : "Map containing S3 inventory configuration.",
+         "required" : false,
+         "type" : "any"
+      },
+      "inventory_self_source_destination" : {
+         "description" : "Whether or not the inventory source bucket is also the destination bucket.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "inventory_source_account_id" : {
+         "description" : "The inventory source account id.",
+         "required" : false,
+         "type" : "string"
+      },
+      "inventory_source_bucket_arn" : {
+         "description" : "The inventory source bucket ARN.",
+         "required" : false,
+         "type" : "string"
+      },
+      "is_directory_bucket" : {
+         "description" : "If the s3 bucket created is a directory bucket",
+         "required" : false,
+         "type" : "bool"
+      },
+      "lb_log_delivery_policy_source_organizations" : {
+         "description" : "(Optional) List of AWS Organization IDs should be allowed to deliver ALB/NLB logs to this bucket.",
+         "required" : false,
+         "type" : "list(string)"
+      },
+      "lifecycle_rule" : {
+         "description" : "List of maps containing configuration of object lifecycle management.",
+         "required" : false,
+         "type" : "any"
+      },
+      "location_type" : {
+         "description" : "Location type. Valid values: `AvailabilityZone` or `LocalZone`",
+         "required" : false,
+         "type" : "string"
+      },
+      "logging" : {
+         "default" : "{",
+         "description" : "Map containing access bucket logging configuration.",
+         "required" : false,
+         "type" : "any"
+      },
+      "metadata_encryption_configuration" : {
+         "description" : "Encryption configuration block",
+         "required" : false,
+         "type" : "any"
+      },
+      "metadata_inventory_table_configuration_state" : {
+         "description" : "Configuration state of the inventory table, indicating whether the inventory table is enabled or disabled. Valid values: ENABLED, DISABLED",
+         "required" : false,
+         "type" : "string"
+      },
+      "metadata_journal_table_record_expiration" : {
+         "description" : "Whether journal table record expiration is enabled or disabled. Valid values: ENABLED, DISABLED",
+         "required" : false,
+         "type" : "string"
+      },
+      "metadata_journal_table_record_expiration_days" : {
+         "description" : "Number of days to retain journal table records",
+         "required" : false,
+         "type" : "number"
+      },
+      "metric_configuration" : {
+         "description" : "Map containing bucket metric configuration.",
+         "required" : false,
+         "type" : "any"
+      },
+      "object_lock_configuration" : {
+         "default" : "{",
+         "description" : "Map containing S3 object locking configuration.",
+         "required" : false,
+         "type" : "any"
+      },
+      "object_lock_enabled" : {
+         "description" : "Whether S3 bucket should have an Object Lock configuration enabled.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "object_ownership" : {
+         "description" : "Object ownership. Valid values: BucketOwnerEnforced, BucketOwnerPreferred or ObjectWriter. 'BucketOwnerEnforced': ACLs are disabled, and the bucket owner automatically owns and has full control over every object in the bucket. 'BucketOwnerPreferred': Objects uploaded to the bucket change ownership to the bucket owner if the objects are uploaded with the bucket-owner-full-control canned ACL. 'ObjectWriter': The uploading account will own the object if the object is uploaded with the bucket-owner-full-control canned ACL.",
+         "required" : false,
+         "type" : "string"
+      },
+      "owner" : {
+         "default" : "{",
+         "description" : "Bucket owner's display name and ID. Conflicts with `acl`",
+         "required" : false,
+         "type" : "map(string)"
+      },
+      "policy" : {
+         "description" : "(Optional) A valid bucket policy JSON document. Note that if the policy document is not specific enough (but still valid), Terraform may view the policy as constantly changing in a terraform plan. In this case, please make sure you use the verbose/specific version of the policy. For more information about building AWS IAM policy documents with Terraform, see the AWS IAM Policy Document Guide.",
+         "required" : false,
+         "type" : "string"
+      },
+      "putin_khuylo" : {
+         "description" : "Do you agree that Putin doesn't respect Ukrainian sovereignty and territorial integrity? More info: https://en.wikipedia.org/wiki/Putin_khuylo!",
+         "required" : false,
+         "type" : "bool"
+      },
+      "region" : {
+         "description" : "Region where the resource(s) will be managed. Defaults to the region set in the provider configuration",
+         "required" : false,
+         "type" : "string"
+      },
+      "replication_configuration" : {
+         "default" : "{",
+         "description" : "Map containing cross-region replication configuration.",
+         "required" : false,
+         "type" : "any"
+      },
+      "request_payer" : {
+         "description" : "(Optional) Specifies who should bear the cost of Amazon S3 data transfer. Can be either BucketOwner or Requester. By default, the owner of the S3 bucket would incur the costs of any data transfer. See Requester Pays Buckets developer guide for more information.",
+         "required" : false,
+         "type" : "string"
+      },
+      "restrict_public_buckets" : {
+         "description" : "Whether Amazon S3 should restrict public bucket policies for this bucket.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "server_side_encryption_configuration" : {
+         "default" : "{",
+         "description" : "Map containing server-side encryption configuration.",
+         "required" : false,
+         "type" : "any"
+      },
+      "skip_destroy_public_access_block" : {
+         "description" : "Whether to skip destroying the S3 Bucket Public Access Block configuration when destroying the bucket. Only used if `public_access_block` is set to true.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "tags" : {
+         "default" : "{",
+         "description" : "(Optional) A mapping of tags to assign to the bucket.",
+         "required" : false,
+         "template_suggestion" : "Standard tags are added in terragrunt.hcl",
+         "type" : "map(string)"
+      },
+      "transition_default_minimum_object_size" : {
+         "description" : "The default minimum object size behavior applied to the lifecycle configuration. Valid values: all_storage_classes_128K (default), varies_by_storage_class",
+         "required" : false,
+         "type" : "string"
+      },
+      "type" : {
+         "description" : "Bucket type. Valid values: `Directory`",
+         "required" : false,
+         "type" : "string"
+      },
+      "versioning" : {
+         "default" : "{",
+         "description" : "Map containing versioning configuration.",
+         "required" : false,
+         "type" : "map(string)"
+      },
+      "website" : {
+         "default" : "{",
+         "description" : "Map containing static web-site hosting or redirect configuration.",
+         "required" : false,
+         "type" : "any"
+      }
+   },
+   "template_variables" : {
+      "env_name" : "{{env_name}}",
+      "full_name" : "{{full_name}}",
+      "project_name" : "{{project_name}}",
+      "region_name" : "{{region_name}}",
+      "resource_name" : "{{resource_name}}",
+      "zone_name" : "{{zone_name}}"
+   }
+}

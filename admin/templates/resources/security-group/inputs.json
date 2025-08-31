@@ -1,0 +1,294 @@
+{
+   "_metadata" : {
+      "generated_at" : "2025-08-31T18:39:50Z",
+      "generated_by" : "create-resource-template.pl",
+      "module_source" : "tfr:///terraform-aws-modules/security-group/aws",
+      "resource_type" : "security-group",
+      "terraform_module_analyzed" : true
+   },
+   "module_variables" : {
+      "computed_egress_rules" : {
+         "description" : "List of computed egress rules to create by name",
+         "required" : false,
+         "type" : "list(string)"
+      },
+      "computed_egress_with_cidr_blocks" : {
+         "description" : "List of computed egress rules to create where 'cidr_blocks' is used",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "computed_egress_with_ipv6_cidr_blocks" : {
+         "description" : "List of computed egress rules to create where 'ipv6_cidr_blocks' is used",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "computed_egress_with_prefix_list_ids" : {
+         "description" : "List of computed egress rules to create where 'prefix_list_ids' is used only",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "computed_egress_with_self" : {
+         "description" : "List of computed egress rules to create where 'self' is defined",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "computed_egress_with_source_security_group_id" : {
+         "description" : "List of computed egress rules to create where 'source_security_group_id' is used",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "computed_ingress_rules" : {
+         "description" : "List of computed ingress rules to create by name",
+         "required" : false,
+         "type" : "list(string)"
+      },
+      "computed_ingress_with_cidr_blocks" : {
+         "description" : "List of computed ingress rules to create where 'cidr_blocks' is used",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "computed_ingress_with_ipv6_cidr_blocks" : {
+         "description" : "List of computed ingress rules to create where 'ipv6_cidr_blocks' is used",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "computed_ingress_with_prefix_list_ids" : {
+         "description" : "List of computed ingress rules to create where 'prefix_list_ids' is used",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "computed_ingress_with_self" : {
+         "description" : "List of computed ingress rules to create where 'self' is defined",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "computed_ingress_with_source_security_group_id" : {
+         "description" : "List of computed ingress rules to create where 'source_security_group_id' is used",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "create" : {
+         "description" : "Whether to create security group and all rules",
+         "required" : false,
+         "type" : "bool"
+      },
+      "create_sg" : {
+         "description" : "Whether to create security group",
+         "required" : false,
+         "type" : "bool"
+      },
+      "create_timeout" : {
+         "description" : "Time to wait for a security group to be created",
+         "required" : false,
+         "type" : "string"
+      },
+      "delete_timeout" : {
+         "description" : "Time to wait for a security group to be deleted",
+         "required" : false,
+         "type" : "string"
+      },
+      "description" : {
+         "description" : "Description of security group",
+         "required" : false,
+         "type" : "string"
+      },
+      "egress_cidr_blocks" : {
+         "description" : "List of IPv4 CIDR ranges to use on all egress rules",
+         "required" : false,
+         "type" : "list(string)"
+      },
+      "egress_ipv6_cidr_blocks" : {
+         "description" : "List of IPv6 CIDR ranges to use on all egress rules",
+         "required" : false,
+         "type" : "list(string)"
+      },
+      "egress_prefix_list_ids" : {
+         "description" : "List of prefix list IDs (for allowing access to VPC endpoints) to use on all egress rules",
+         "required" : false,
+         "type" : "list(string)"
+      },
+      "egress_rules" : {
+         "description" : "List of egress rules to create by name",
+         "required" : false,
+         "type" : "list(string)"
+      },
+      "egress_with_cidr_blocks" : {
+         "description" : "List of egress rules to create where 'cidr_blocks' is used",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "egress_with_ipv6_cidr_blocks" : {
+         "description" : "List of egress rules to create where 'ipv6_cidr_blocks' is used",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "egress_with_prefix_list_ids" : {
+         "description" : "List of egress rules to create where 'prefix_list_ids' is used only",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "egress_with_self" : {
+         "description" : "List of egress rules to create where 'self' is defined",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "egress_with_source_security_group_id" : {
+         "description" : "List of egress rules to create where 'source_security_group_id' is used",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "ingress_cidr_blocks" : {
+         "description" : "List of IPv4 CIDR ranges to use on all ingress rules",
+         "required" : false,
+         "type" : "list(string)"
+      },
+      "ingress_ipv6_cidr_blocks" : {
+         "description" : "List of IPv6 CIDR ranges to use on all ingress rules",
+         "required" : false,
+         "type" : "list(string)"
+      },
+      "ingress_prefix_list_ids" : {
+         "description" : "List of prefix list IDs (for allowing access to VPC endpoints) to use on all ingress rules",
+         "required" : false,
+         "type" : "list(string)"
+      },
+      "ingress_rules" : {
+         "description" : "List of ingress rules to create by name",
+         "required" : false,
+         "type" : "list(string)"
+      },
+      "ingress_with_cidr_blocks" : {
+         "description" : "List of ingress rules to create where 'cidr_blocks' is used",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "ingress_with_ipv6_cidr_blocks" : {
+         "description" : "List of ingress rules to create where 'ipv6_cidr_blocks' is used",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "ingress_with_prefix_list_ids" : {
+         "description" : "List of ingress rules to create where 'prefix_list_ids' is used only",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "ingress_with_self" : {
+         "description" : "List of ingress rules to create where 'self' is defined",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "ingress_with_source_security_group_id" : {
+         "description" : "List of ingress rules to create where 'source_security_group_id' is used",
+         "required" : false,
+         "type" : "list(map(string))"
+      },
+      "name" : {
+         "description" : "Name of security group - not required if create_sg is false",
+         "required" : false,
+         "template_suggestion" : "Use {{full_name}} for consistent naming",
+         "type" : "string"
+      },
+      "number_of_computed_egress_rules" : {
+         "description" : "Number of computed egress rules to create by name",
+         "required" : false,
+         "type" : "number"
+      },
+      "number_of_computed_egress_with_cidr_blocks" : {
+         "description" : "Number of computed egress rules to create where 'cidr_blocks' is used",
+         "required" : false,
+         "type" : "number"
+      },
+      "number_of_computed_egress_with_ipv6_cidr_blocks" : {
+         "description" : "Number of computed egress rules to create where 'ipv6_cidr_blocks' is used",
+         "required" : false,
+         "type" : "number"
+      },
+      "number_of_computed_egress_with_prefix_list_ids" : {
+         "description" : "Number of computed egress rules to create where 'prefix_list_ids' is used only",
+         "required" : false,
+         "type" : "number"
+      },
+      "number_of_computed_egress_with_self" : {
+         "description" : "Number of computed egress rules to create where 'self' is defined",
+         "required" : false,
+         "type" : "number"
+      },
+      "number_of_computed_egress_with_source_security_group_id" : {
+         "description" : "Number of computed egress rules to create where 'source_security_group_id' is used",
+         "required" : false,
+         "type" : "number"
+      },
+      "number_of_computed_ingress_rules" : {
+         "description" : "Number of computed ingress rules to create by name",
+         "required" : false,
+         "type" : "number"
+      },
+      "number_of_computed_ingress_with_cidr_blocks" : {
+         "description" : "Number of computed ingress rules to create where 'cidr_blocks' is used",
+         "required" : false,
+         "type" : "number"
+      },
+      "number_of_computed_ingress_with_ipv6_cidr_blocks" : {
+         "description" : "Number of computed ingress rules to create where 'ipv6_cidr_blocks' is used",
+         "required" : false,
+         "type" : "number"
+      },
+      "number_of_computed_ingress_with_prefix_list_ids" : {
+         "description" : "Number of computed ingress rules to create where 'prefix_list_ids' is used",
+         "required" : false,
+         "type" : "number"
+      },
+      "number_of_computed_ingress_with_self" : {
+         "description" : "Number of computed ingress rules to create where 'self' is defined",
+         "required" : false,
+         "type" : "number"
+      },
+      "number_of_computed_ingress_with_source_security_group_id" : {
+         "description" : "Number of computed ingress rules to create where 'source_security_group_id' is used",
+         "required" : false,
+         "type" : "number"
+      },
+      "putin_khuylo" : {
+         "description" : "Do you agree that Putin doesn't respect Ukrainian sovereignty and territorial integrity? More info: https://en.wikipedia.org/wiki/Putin_khuylo!",
+         "required" : false,
+         "type" : "bool"
+      },
+      "revoke_rules_on_delete" : {
+         "description" : "Instruct Terraform to revoke all of the Security Groups attached ingress and egress rules before deleting the rule itself. Enable for EMR.",
+         "required" : false,
+         "type" : "bool"
+      },
+      "security_group_id" : {
+         "description" : "ID of existing security group whose rules we will manage",
+         "required" : false,
+         "template_suggestion" : "Reference from dependency block in terragrunt.hcl",
+         "type" : "string"
+      },
+      "tags" : {
+         "default" : "{",
+         "description" : "A mapping of tags to assign to security group",
+         "required" : false,
+         "template_suggestion" : "Standard tags are added in terragrunt.hcl",
+         "type" : "map(string)"
+      },
+      "use_name_prefix" : {
+         "description" : "Whether to use name_prefix or fixed name. Should be true to able to update security group name after initial creation",
+         "required" : false,
+         "type" : "bool"
+      },
+      "vpc_id" : {
+         "description" : "ID of the VPC where to create security group",
+         "required" : false,
+         "template_suggestion" : "Reference from dependency block in terragrunt.hcl",
+         "type" : "string"
+      }
+   },
+   "template_variables" : {
+      "env_name" : "{{env_name}}",
+      "full_name" : "{{full_name}}",
+      "project_name" : "{{project_name}}",
+      "region_name" : "{{region_name}}",
+      "resource_name" : "{{resource_name}}",
+      "zone_name" : "{{zone_name}}"
+   }
+}
