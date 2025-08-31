@@ -115,8 +115,8 @@ sub get_template_variables {
         template_dir   => $self->{template_dir} || '',
         full_name      => $full_name,
     );
-    
-    return %vars;
+
+    return \%vars;
 }
 
 # Build full name from available components
@@ -143,11 +143,11 @@ sub process_template {
     close $in_fh;
     
     # Get variables
-    my %vars = $self->get_template_variables();
-    
+    my $vars = $self->get_template_variables();
+
     # Replace variables
-    foreach my $key (keys %vars) {
-        my $value = $vars{$key};
+    foreach my $key (keys %{$vars}) {
+        my $value = $vars->{$key};
         $content =~ s/\{\{$key\}\}/$value/g;
     }
     

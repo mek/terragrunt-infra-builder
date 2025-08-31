@@ -75,71 +75,71 @@ sub validate {
 # Additional template variables for zones
 sub get_template_variables {
     my $self = shift;
-    
-    my %vars = $self->SUPER::get_template_variables();
-    
+
+    my $vars = $self->SUPER::get_template_variables();
+
     # Zone-specific variables
-    $vars{zone} = $self->{name};
-    $vars{availability_zone} = $self->{name};
-    
+    $vars->{zone} = $self->{name};
+    $vars->{availability_zone} = $self->{name};
+
     # Extract zone info
     if ($self->{name} =~ /^(.+)([a-z])$/) {
-        $vars{zone_region} = $1;      # us-east-1
-        $vars{zone_letter} = $2;      # a, b, c, etc.
+        $vars->{zone_region} = $1;      # us-east-1
+        $vars->{zone_letter} = $2;      # a, b, c, etc.
     }
 
     # Convert zone letter to number for subnet calculations
-    my $letter = $vars{zone_letter} || 'a';
-    $vars{zone_letter_num} = ord(lc($letter)) - ord('a') + 1;
-    
+    my $letter = $vars->{zone_letter} || 'a';
+    $vars->{zone_letter_num} = ord(lc($letter)) - ord('a') + 1;
+
     # Zone-specific settings
-    $vars{zone_settings} = qq|{
+    $vars->{zone_settings} = qq|{
     # Availability zone
     availability_zone = "$self->{name}"
-    
+
     # Subnet configuration for this AZ
-    private_subnet = "10.0.$vars{zone_letter_num}.0/24"
-    public_subnet  = "10.0.10$vars{zone_letter_num}.0/24"
-    
+    private_subnet = "10.0.$vars->{zone_letter_num}.0/24"
+    public_subnet  = "10.0.10$vars->{zone_letter_num}.0/24"
+
     # Zone-specific instance settings
     preferred_instance_types = ["t3.micro", "t3.small", "t3.medium"]
-    
+
     # Storage settings
     ebs_optimized = true
     volume_type = "gp3"
   }|;
-    
+
     # Update zone_settings with calculated subnet values
-    $vars{zone_settings} = qq|{
+    $vars->{zone_settings} = qq|{
     # Availability zone
     availability_zone = "$self->{name}"
-    
+
     # Subnet configuration for this AZ
-    private_subnet = "10.0.$vars{zone_letter_num}.0/24"
-    public_subnet  = "10.0.10$vars{zone_letter_num}.0/24"
-    
+    private_subnet = "10.0.$vars->{zone_letter_num}.0/24"
+    public_subnet  = "10.0.10$vars->{zone_letter_num}.0/24"
+
     # Zone-specific instance settings
     preferred_instance_types = ["t3.micro", "t3.small", "t3.medium"]
-    
+
     # Storage settings
     ebs_optimized = true
     volume_type = "gp3"
   }|;
-    
+
     # Common tags
-    $vars{common_tags} = qq|{
+    $vars->{common_tags} = qq|{
     Zone        = "$self->{name}"
     Region      = "$self->{region_name}"
     Environment = "$self->{env_name}"|;
-    
+
     if ($self->{project_name}) {
-        $vars{common_tags} .= qq|\n    Project     = "$self->{project_name}"|;
+        $vars->{common_tags} .= qq|\n    Project     = "$self->{project_name}"|;
     }
-    
-    $vars{common_tags} .= qq|\n    ManagedBy   = "Terragrunt"
+
+    $vars->{common_tags} .= qq|\n    ManagedBy   = "Terragrunt"
   }|;
-    
-    return %vars;
+
+    return $vars;
 }
 
 sub post_create {

@@ -266,15 +266,15 @@ subtest 'Zone template variables generation' => sub {
         template_dir => "$test_workspace/admin/templates",
     );
     
-    my %vars = $zone->get_template_variables();
-    
-    is($vars{zone}, 'us-east-1c', 'Zone variable');
-    is($vars{availability_zone}, 'us-east-1c', 'Availability zone variable');
-    is($vars{zone_region}, 'us-east-1', 'Zone region variable');
-    is($vars{zone_letter}, 'c', 'Zone letter variable');
-    is($vars{zone_letter_num}, 3, 'Zone letter number (c = 3)');
-    like($vars{zone_settings}, qr/private_subnet = "10\.0\.3\.0\/24"/, 'Private subnet calculation');
-    like($vars{common_tags}, qr/Project\s*=\s*"varproject"/, 'Project tag in common tags');
+    my $vars = $zone->get_template_variables();
+
+    is($vars->{zone}, 'us-east-1c', 'Zone variable');
+    is($vars->{availability_zone}, 'us-east-1c', 'Availability zone variable');
+    is($vars->{zone_region}, 'us-east-1', 'Zone region variable');
+    is($vars->{zone_letter}, 'c', 'Zone letter variable');
+    is($vars->{zone_letter_num}, 3, 'Zone letter number (c = 3)');
+    like($vars->{zone_settings}, qr/private_subnet = "10\.0\.3\.0\/24"/, 'Private subnet calculation');
+    like($vars->{common_tags}, qr/Project\s*=\s*"varproject"/, 'Project tag in common tags');
     
     chdir $original_cwd;
 };

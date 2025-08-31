@@ -64,18 +64,18 @@ subtest 'Template variables generation' => sub {
         template_dir => $template_dir,
     );
     
-    my %vars = $base->get_template_variables();
-    
-    is($vars{name}, 'test-infra', 'Name variable is correct');
-    is($vars{env_name}, 'production', 'Environment name variable is correct');
-    is($vars{project_name}, 'webapp', 'Project name variable is correct');
-    is($vars{region_name}, 'us-west-2', 'Region name variable is correct');
-    is($vars{workspace_root}, $workspace_root, 'Workspace root variable is correct');
-    is($vars{template_dir}, $template_dir, 'Template directory variable is correct');
-    
+    my $vars = $base->get_template_variables();
+
+    is($vars->{name}, 'test-infra', 'Name variable is correct');
+    is($vars->{env_name}, 'production', 'Environment name variable is correct');
+    is($vars->{project_name}, 'webapp', 'Project name variable is correct');
+    is($vars->{region_name}, 'us-west-2', 'Region name variable is correct');
+    is($vars->{workspace_root}, $workspace_root, 'Workspace root variable is correct');
+    is($vars->{template_dir}, $template_dir, 'Template directory variable is correct');
+
     # Check full_name construction
-    like($vars{full_name}, qr/production/, 'Full name contains environment');
-    like($vars{full_name}, qr/test-infra/, 'Full name contains resource name');
+    like($vars->{full_name}, qr/production/, 'Full name contains environment');
+    like($vars->{full_name}, qr/test-infra/, 'Full name contains resource name');
 };
 
 subtest 'Optional parameters handling' => sub {
@@ -112,11 +112,11 @@ subtest 'Full name generation' => sub {
         template_dir => $template_dir,
     );
     
-    my %full_vars = $full_base->get_template_variables();
-    like($full_vars{full_name}, qr/prod/, 'Full name includes environment');
-    like($full_vars{full_name}, qr/api/, 'Full name includes project');
-    like($full_vars{full_name}, qr/us-east-1/, 'Full name includes region');
-    like($full_vars{full_name}, qr/resource/, 'Full name includes resource name');
+    my $full_vars = $full_base->get_template_variables();
+    like($full_vars->{full_name}, qr/prod/, 'Full name includes environment');
+    like($full_vars->{full_name}, qr/api/, 'Full name includes project');
+    like($full_vars->{full_name}, qr/us-east-1/, 'Full name includes region');
+    like($full_vars->{full_name}, qr/resource/, 'Full name includes resource name');
 };
 
 subtest 'Default target path' => sub {
