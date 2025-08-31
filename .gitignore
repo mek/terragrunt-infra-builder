@@ -1,0 +1,355 @@
+# Terragrunt Infrastructure Management System - .gitignore
+# Copyright (c) 2017-2025 Mat Kovach <mek@mek.cc>
+
+#######################
+# Terraform & Terragrunt
+#######################
+
+# Local .terraform directories
+**/.terraform/*
+**/.terragrunt-cache/*
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Terragrunt working directories
+.terragrunt-cache/
+
+# Exclude all .tfvars files, which are likely to contain sensitive data
+*.tfvars
+*.tfvars.json
+
+# Ignore override files as they are usually used to override resources locally
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Include override files you do wish to add to version control using negated pattern
+# !example_override.tf
+
+# Include .tfvars files you do wish to add to version control using negated pattern
+# !example.tfvars
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Plan files
+*.plan
+*.out
+
+#######################
+# AWS & Cloud Credentials
+#######################
+
+# AWS credentials and config
+.aws/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Service account keys
+*-service-account.json
+*-credentials.json
+
+# Environment variable files
+.env
+.env.local
+.env.*.local
+
+#######################
+# Perl Specific
+#######################
+
+# Perl temporary files
+*.tmp
+*.bak
+*~
+
+# Perl module build files
+Makefile.PL
+Build.PL
+MYMETA.*
+.build/
+_build/
+Build
+blib/
+
+# Carton (Perl dependency manager)
+cpanfile.snapshot
+local/
+
+# Perl coverage files
+cover_db/
+
+#######################
+# IDE and Editor Files
+#######################
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-*
+
+# Vim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Atom
+.atom/
+
+#######################
+# Operating System Files
+#######################
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.tmp
+*.temp
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+#######################
+# Logs and Temporary Files
+#######################
+
+# Log files
+*.log
+logs/
+log/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Temporary directories
+tmp/
+temp/
+.tmp/
+
+#######################
+# Project Specific Files
+#######################
+
+# Generated documentation
+docs/generated/
+
+# Test output and artifacts
+test-output/
+*.test
+
+# Downloaded modules and dependencies
+modules/downloaded/
+vendor/
+
+# Generated inputs.json files (optional - uncomment if you don't want to track them)
+# **/inputs.json
+
+# Configuration files with sensitive data
+*-config.local.yaml
+*-config.local.yml
+*.local.yaml
+*.local.yml
+
+# Backup files from manage.pl
+*.yaml~
+*.yml~
+*.hcl~
+*.pl~
+*.md~
+
+# Output files from terragrunt-deploy.pl
+**/output.json
+
+# Lock files
+*.lock
+
+# API analysis cache (from terraform-module-analyzer.pl)
+.module-cache/
+analysis-results/
+
+# External configuration files (these should be customized per deployment)
+**/vpc-config.json
+**/backend-config.json
+**/external-config.json
+
+# Unless you want to track example configs
+!**/vpc-config.example.json
+!**/backend-config.example.json
+!**/external-config.example.json
+
+#######################
+# Archives and Packages
+#######################
+
+# Compressed files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+#######################
+# Database and Data Files
+#######################
+
+# SQLite
+*.sqlite
+*.sqlite3
+*.db
+
+# Other databases
+*.mdb
+*.accdb
+
+#######################
+# Security and Secrets
+#######################
+
+# Secret files
+secrets/
+*.secret
+*.secrets
+
+# Certificate files
+*.crt
+*.cer
+*.der
+*.csr
+
+# SSH keys
+id_rsa*
+id_dsa*
+id_ecdsa*
+id_ed25519*
+
+# GPG
+*.gpg
+*.asc
+
+#######################
+# Build Artifacts
+#######################
+
+# Distribution files
+dist/
+build/
+out/
+
+# Compiled binaries
+*.exe
+*.out
+*.app
+*.deb
+*.rpm
+
+#######################
+# Cache Directories
+#######################
+
+# General cache
+.cache/
+cache/
+
+# NPM (if using any Node.js tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+#######################
+# Custom Exceptions
+#######################
+
+# Include important template and example files
+!admin/templates/**
+!docs/**/*.md
+!*.example.*
+!LICENSE
+!README.md
+
+# Include configuration templates but not actual configs
+!admin/manage-config.yaml
+!terragrunt.hcl
+
+# Include important scripts
+!*.pl
+!*.sh
+!run_tests.pl
+
+CLAUDE.md
+GEMEINI.md
+

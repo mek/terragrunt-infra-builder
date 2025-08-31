@@ -1,0 +1,19 @@
+{
+  "description": "Simple test configuration",
+  "version": "1.0",
+  "environments": ["demo"],
+  "global_resources": ["demo"],
+  "regions": [
+    {
+      "name": "us-central-1",
+      "environment": "demo"
+    }
+  ],
+  "zones": [
+    {
+      "name": "z1a",
+      "environment": "demo",
+      "region": "us-central-1"
+    }
+  ]
+}

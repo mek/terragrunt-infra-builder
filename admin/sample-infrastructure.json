@@ -1,0 +1,52 @@
+{
+  "description": "Sample infrastructure configuration for bulk creation",
+  "version": "1.0",
+  "environments": [
+    "test",
+    "qa"
+  ],
+  "global_resources": [
+    "test",
+    "qa"
+  ],
+  "regions": [
+    {
+      "name": "us-east-1",
+      "environment": "test"
+    },
+    {
+      "name": "us-west-2", 
+      "environment": "test"
+    },
+    {
+      "name": "eu-west-1",
+      "environment": "qa"
+    }
+  ],
+  "zones": [
+    {
+      "name": "z1a",
+      "environment": "test",
+      "region": "us-east-1"
+    },
+    {
+      "name": "z1b",
+      "environment": "test", 
+      "region": "us-east-1"
+    },
+    {
+      "name": "z1a",
+      "environment": "test",
+      "region": "us-west-2"
+    },
+    {
+      "name": "z1a",
+      "environment": "qa",
+      "region": "eu-west-1"
+    }
+  ],
+  "projects": [
+    "webapp",
+    "api"
+  ]
+}

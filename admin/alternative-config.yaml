@@ -1,0 +1,72 @@
+# Alternative Infrastructure Management Configuration
+# This demonstrates a different directory structure for a different organization
+
+# Directory structure configuration
+directories:
+  # Different base paths for this organization
+  environments: "environments"
+  projects: "applications"
+  modules: "terraform-modules"
+  
+  # Environment-specific directory structure
+  environment_structure:
+    # Where to place global resources within an environment
+    global: "global"
+    
+    # Use project-based regional placement
+    regional_placement: "project_based"
+    
+    # Different default project name
+    default_project: "main"
+    
+    # Where to place regional resources
+    regional: "regional"
+    
+    # Where to place zone resources within a region
+    zones: "availability-zones"
+
+# Template configuration
+templates:
+  # Base directory for templates
+  base_path: "admin/templates"
+  
+  # Template subdirectories for each resource type
+  environment: "env"
+  global: "global"
+  region: "region"
+  zone: "zone"
+  project: "project"
+
+# File naming configuration
+files:
+  # Configuration files for each resource type
+  environment: "env.hcl"
+  region: "region.hcl"
+  project: "project.hcl"
+  
+  # Terragrunt configuration files
+  terragrunt: "terragrunt.hcl"
+  
+  # Global terragrunt file (for global resources)
+  global_terragrunt: "terragrunt.hcl"
+
+# Validation rules
+validation:
+  # Required files for each resource type to be considered valid
+  environment_required_files: ["env.hcl"]
+  region_required_files: ["region.hcl"]
+  zone_required_files: ["terragrunt.hcl"]
+  project_required_files: ["project.hcl"]
+  global_required_files: ["terragrunt.hcl"]
+
+# Naming conventions
+naming:
+  # Default naming patterns for resources
+  environment_pattern: "{name}"
+  region_pattern: "{name}"
+  zone_pattern: "{name}"
+  project_pattern: "{name}"
+  
+  # Special naming for global and regional directories
+  global_dir_name: "global"
+  regional_dir_name: "regional"

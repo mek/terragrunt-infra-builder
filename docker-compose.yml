@@ -1,0 +1,110 @@
+# Terragrunt Infrastructure Management System - Docker Compose
+# Copyright (c) 2017-2025 Mat Kovach <mek@mek.cc>
+# Licensed under the MIT License
+
+version: '3.8'
+
+services:
+  # Main terragrunt infrastructure management service
+  terragrunt-manager:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: terragrunt-infra-manager
+    hostname: terragrunt-manager
+    
+    # Environment variables
+    environment:
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+      - AWS_PROFILE=${AWS_PROFILE:-default}
+      - TF_LOG=${TF_LOG:-}
+      - TG_LOG=${TG_LOG:-}
+      - PERL5LIB=./lib
+    
+    # Volume mounts
+    volumes:
+      # Mount the workspace (current directory)
+      - .:/home/terragrunt/workspace
+      
+      # AWS credentials (uncomment one of these options)
+      # Option 1: Mount your AWS credentials directory (read-only)
+      # - ~/.aws:/home/terragrunt/.aws:ro
+      
+      # Option 2: Mount specific AWS files
+      # - ~/.aws/credentials:/home/terragrunt/.aws/credentials:ro
+      # - ~/.aws/config:/home/terragrunt/.aws/config:ro
+      
+      # SSH keys (if needed for git operations)
+      # - ~/.ssh:/home/terragrunt/.ssh:ro
+      
+      # Cache directories for better performance
+      - terragrunt-cache:/home/terragrunt/.terragrunt-cache
+      - terraform-cache:/home/terragrunt/.terraform.d
+      - cpan-cache:/home/terragrunt/.cpanm
+    
+    # Working directory
+    working_dir: /home/terragrunt/workspace
+    
+    # Keep container running
+    tty: true
+    stdin_open: true
+    
+    # Resource limits (adjust as needed)
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+  # Development service with additional tools
+  terragrunt-dev:
+    extends: terragrunt-manager
+    container_name: terragrunt-infra-dev
+    hostname: terragrunt-dev
+    
+    # Additional development environment variables
+    environment:
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+      - AWS_PROFILE=${AWS_PROFILE:-default}
+      - TF_LOG=${TF_LOG:-DEBUG}
+      - TG_LOG=${TG_LOG:-DEBUG}
+      - PERL5LIB=./lib
+      - PERL_DL_NONLAZY=1
+    
+    # Mount additional development volumes
+    volumes:
+      - .:/home/terragrunt/workspace
+      - terragrunt-cache:/home/terragrunt/.terragrunt-cache
+      - terraform-cache:/home/terragrunt/.terraform.d
+      - cpan-cache:/home/terragrunt/.cpanm
+      # Development specific mounts
+      - dev-home:/home/terragrunt/.local
+    
+    # Development ports (if needed)
+    # ports:
+    #   - "8080:8080"
+
+# Named volumes for caching
+volumes:
+  terragrunt-cache:
+    name: terragrunt-cache
+    driver: local
+  terraform-cache:
+    name: terraform-cache
+    driver: local
+  cpan-cache:
+    name: cpan-cache
+    driver: local
+  dev-home:
+    name: terragrunt-dev-home
+    driver: local
+
+# Networks (optional)
+networks:
+  default:
+    name: terragrunt-network

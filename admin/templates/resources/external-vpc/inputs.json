@@ -1,0 +1,32 @@
+{
+   "_metadata" : {
+      "generated_at" : "2025-08-31T14:02:56Z",
+      "generated_by" : "create-resource-template.pl",
+      "module_source" : "unknown",
+      "note" : "Basic template - run terraform-module-analyzer.pl for detailed analysis",
+      "resource_type" : "external-vpc",
+      "terraform_module_analyzed" : false
+   },
+   "module_variables" : {
+      "name" : {
+         "description" : "Resource name",
+         "required" : true,
+         "template_suggestion" : "Use {{full_name}} for consistent naming",
+         "type" : "string"
+      },
+      "tags" : {
+         "description" : "Tags to apply to resources",
+         "required" : false,
+         "template_suggestion" : "Standard tags are added in terragrunt.hcl",
+         "type" : "map(string)"
+      }
+   },
+   "template_variables" : {
+      "env_name" : "{{env_name}}",
+      "full_name" : "{{full_name}}",
+      "project_name" : "{{project_name}}",
+      "region_name" : "{{region_name}}",
+      "resource_name" : "{{resource_name}}",
+      "zone_name" : "{{zone_name}}"
+   }
+}
