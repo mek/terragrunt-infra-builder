@@ -35,25 +35,25 @@ sub validate {
 # Additional template variables for projects
 sub get_template_variables {
     my $self = shift;
-    
-    my %vars = $self->SUPER::get_template_variables();
-    
+
+    my $vars = $self->SUPER::get_template_variables();
+
     # Project-specific variables
-    $vars{project} = $self->{name};
-    
+    $vars->{project} = $self->{name};
+
     # Project type detection based on name
     if ($self->{name} =~ /^(api|backend|service)/) {
-        $vars{project_type} = 'backend';
+        $vars->{project_type} = 'backend';
     } elsif ($self->{name} =~ /^(web|frontend|ui|app)/) {
-        $vars{project_type} = 'frontend';
+        $vars->{project_type} = 'frontend';
     } elsif ($self->{name} =~ /^(data|analytics|ml|ai)/) {
-        $vars{project_type} = 'data';
+        $vars->{project_type} = 'data';
     } elsif ($self->{name} =~ /^(infra|infrastructure|platform)/) {
-        $vars{project_type} = 'infrastructure';
+        $vars->{project_type} = 'infrastructure';
     } else {
-        $vars{project_type} = 'application';
+        $vars->{project_type} = 'application';
     }
-    
+
     # Default resource settings based on project type
     my %type_settings = (
         'backend' => {
@@ -87,29 +87,29 @@ sub get_template_variables {
             enable_scaling => 'true'
         }
     );
-    
-    my $settings = $type_settings{$vars{project_type}} || $type_settings{'application'};
+
+    my $settings = $type_settings{$vars->{project_type}} || $type_settings{'application'};
     foreach my $key (keys %$settings) {
-        $vars{$key} = $settings->{$key};
+        $vars->{$key} = $settings->{$key};
     }
-    
+
     # Common tags
-    $vars{common_tags} = qq|{
+    $vars->{common_tags} = qq|{
     Project   = "$self->{name}"
-    Type      = "$vars{project_type}"
+    Type      = "$vars->{project_type}"
     ManagedBy = "Terragrunt"
   }|;
-    
-    return %vars;
+
+    return $vars;
 }
 
 sub post_create {
     my $self = shift;
     
     if ($self->{verbose}) {
-        my %vars = $self->get_template_variables();
+        my $vars = $self->get_template_variables();
         print "  Project '$self->{name}' created\n";
-        print "    Type: $vars{project_type}\n";
+        print "    Type: $vars->{project_type}\n";
         print "    Path: " . $self->get_target_path() . "\n";
     }
     

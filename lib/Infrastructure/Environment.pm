@@ -35,48 +35,49 @@ sub validate {
 # Additional template variables for environments
 sub get_template_variables {
     my $self = shift;
-    
-    my %vars = $self->SUPER::get_template_variables();
-    
+
+    my $vars = $self->SUPER::get_template_variables();
+
     # Environment-specific variables
-    $vars{environment} = $self->{name};
-    
+    $vars->{environment} = $self->{name};
+
     # Environment type detection
     if ($self->{name} =~ /^(prod|production)$/i) {
-        $vars{env_type} = 'production';
-        $vars{is_production} = 'true';
+        $vars->{env_type} = 'production';
+        $vars->{is_production} = 'true';
     } elsif ($self->{name} =~ /^(staging|stage)$/i) {
-        $vars{env_type} = 'staging';
-        $vars{is_production} = 'false';
+        $vars->{env_type} = 'staging';
+        $vars->{is_production} = 'false';
     } elsif ($self->{name} =~ /^(dev|development)$/i) {
-        $vars{env_type} = 'development';
-        $vars{is_production} = 'false';
+        $vars->{env_type} = 'development';
+        $vars->{is_production} = 'false';
     } elsif ($self->{name} =~ /^test/i) {
-        $vars{env_type} = 'testing';
-        $vars{is_production} = 'false';
+        $vars->{env_type} = 'testing';
+        $vars->{is_production} = 'false';
     } else {
-        $vars{env_type} = 'custom';
-        $vars{is_production} = 'false';
+        $vars->{env_type} = 'custom';
+        $vars->{is_production} = 'false';
     }
-    
+
     # Common tags
-    $vars{common_tags} = qq|{
+    $vars->{common_tags} = qq|{
     Environment = "$self->{name}"
     ManagedBy   = "Terragrunt"
   }|;
-    
-    return %vars;
+
+    return $vars;
 }
 
 sub post_create {
     my $self = shift;
-    
+
     if ($self->{verbose}) {
+        my $vars = $self->get_template_variables();
         print "  Environment '$self->{name}' created\n";
-        print "    Type: " . ($self->get_template_variables())[14] . "\n";  # env_type
+        print "    Type: $vars->{env_type}\n";  # env_type
         print "    Path: " . $self->get_target_path() . "\n";
     }
-    
+
     print "$Infrastructure::Base::GREEN✓ Environment $self->{name} created successfully$Infrastructure::Base::NC\n";
 }
 

@@ -53,49 +53,49 @@ sub validate {
 # Additional template variables for regions
 sub get_template_variables {
     my $self = shift;
-    
-    my %vars = $self->SUPER::get_template_variables();
-    
+
+    my $vars = $self->SUPER::get_template_variables();
+
     # Region-specific variables
-    $vars{aws_region} = $self->{name};
-    $vars{region} = $self->{name};
-    
+    $vars->{aws_region} = $self->{name};
+    $vars->{region} = $self->{name};
+
     # Extract region info
     if ($self->{name} =~ /^([a-z]+)-([a-z]+)-(\d+)$/) {
-        $vars{region_continent} = $1;  # us, eu, ap, etc.
-        $vars{region_location} = $2;   # east, west, central, etc.
-        $vars{region_number} = $3;     # 1, 2, 3, etc.
+        $vars->{region_continent} = $1;  # us, eu, ap, etc.
+        $vars->{region_location} = $2;   # east, west, central, etc.
+        $vars->{region_number} = $3;     # 1, 2, 3, etc.
     }
-    
+
     # Availability zones (common pattern)
     my @azs = ($self->{name}."a", $self->{name}."b", $self->{name}."c");
-    $vars{availability_zones} = '["' . join('", "', @azs) . '"]';
-    
+    $vars->{availability_zones} = '["' . join('", "', @azs) . '"]';
+
     # Region-specific settings
-    $vars{region_settings} = qq|{
+    $vars->{region_settings} = qq|{
     # Availability zones
-    azs = $vars{availability_zones}
-    
+    azs = $vars->{availability_zones}
+
     # Default VPC CIDR (can be overridden)
     vpc_cidr = "10.0.0.0/16"
-    
+
     # Subnets
     private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
     public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
-    
+
     # NAT Gateway settings
     enable_nat_gateway = true
     single_nat_gateway = false
   }|;
-    
+
     # Common tags
-    $vars{common_tags} = qq|{
+    $vars->{common_tags} = qq|{
     Region    = "$self->{name}"
     Environment = "$self->{env_name}"
     ManagedBy = "Terragrunt"
   }|;
-    
-    return %vars;
+
+    return $vars;
 }
 
 sub post_create {

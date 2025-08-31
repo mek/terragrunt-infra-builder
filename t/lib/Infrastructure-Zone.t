@@ -173,17 +173,17 @@ subtest 'Zone template variables' => sub {
         template_dir => $template_dir,
     );
     
-    my %vars = $zone->get_template_variables();
-    
-    is($vars{zone}, 'us-east-1b', 'Zone variable is correct');
-    is($vars{availability_zone}, 'us-east-1b', 'Availability zone variable is correct');
-    is($vars{zone_region}, 'us-east-1', 'Zone region variable is correct');
-    is($vars{zone_letter}, 'b', 'Zone letter variable is correct');
-    is($vars{zone_letter_num}, 2, 'Zone letter number is correct (b = 2)');
-    
-    like($vars{zone_settings}, qr/availability_zone = "us-east-1b"/, 'Zone settings contain availability zone');
-    like($vars{zone_settings}, qr/private_subnet = "10\.0\.2\.0\/24"/, 'Zone settings contain correct private subnet');
-    like($vars{common_tags}, qr/Zone\s*=\s*"us-east-1b"/, 'Common tags contain zone');
+    my $vars = $zone->get_template_variables();
+
+    is($vars->{zone}, 'us-east-1b', 'Zone variable is correct');
+    is($vars->{availability_zone}, 'us-east-1b', 'Availability zone variable is correct');
+    is($vars->{zone_region}, 'us-east-1', 'Zone region variable is correct');
+    is($vars->{zone_letter}, 'b', 'Zone letter variable is correct');
+    is($vars->{zone_letter_num}, 2, 'Zone letter number is correct (b = 2)');
+
+    like($vars->{zone_settings}, qr/availability_zone = "us-east-1b"/, 'Zone settings contain availability zone');
+    like($vars->{zone_settings}, qr/private_subnet = "10\.0\.2\.0\/24"/, 'Zone settings contain correct private subnet');
+    like($vars->{common_tags}, qr/Zone\s*=\s*"us-east-1b"/, 'Common tags contain zone');
 };
 
 subtest 'Factory creation of zones' => sub {
