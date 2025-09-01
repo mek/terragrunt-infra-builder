@@ -35,6 +35,8 @@ sub new {
     
     # Parameters with defaults
     $self->{envs_base} = $args{envs_base} || "envs";
+    $self->{projects_base} = $args{projects_base} || "projects";
+    $self->{structure_ordering} = $args{structure_ordering} || "environment_first";
     $self->{dry_run}   = $args{dry_run} || 0;
     $self->{verbose}   = $args{verbose} || 0;
     $self->{force}     = $args{force} || 0;
@@ -106,28 +108,42 @@ sub get_resource_path {
     my $self = shift;
     
     die "workspace_root not defined" unless $self->{workspace_root};
-    die "envs_base not defined" unless $self->{envs_base};
     die "env_name not defined" unless $self->{env_name};
     die "name not defined" unless $self->{name};
     
-    my $path = "$self->{workspace_root}/$self->{envs_base}/$self->{env_name}";
+    my $structure_order = $self->{structure_ordering} || "environment_first";
     
-    # Add project if specified
-    if ($self->{project_name}) {
-        $path .= "/$self->{project_name}";
+    # Determine base directory and initial path based on structure ordering
+    my $path;
+    if ($structure_order eq "project_first" || $structure_order eq "project-first") {
+        # projects/project/environment/region/zone/resource
+        die "projects_base not defined" unless $self->{projects_base};
+        die "project_name required for project_first structure" unless $self->{project_name};
+        
+        $path = "$self->{workspace_root}/$self->{projects_base}/$self->{project_name}/$self->{env_name}";
+    } else {
+        # envs/environment/project/region/zone/resource (default)
+        die "envs_base not defined" unless $self->{envs_base};
+        
+        $path = "$self->{workspace_root}/$self->{envs_base}/$self->{env_name}";
+        
+        # Add project if specified (for environment_first structure)
+        if ($self->{project_name}) {
+            $path .= "/$self->{project_name}";
+        }
     }
     
-    # Add region if specified
+    # Add region if specified (same for both structures)
     if ($self->{region_name}) {
         $path .= "/$self->{region_name}";
     }
     
-    # Add zone if specified
+    # Add zone if specified (same for both structures)
     if ($self->{zone_name}) {
         $path .= "/$self->{zone_name}";
     }
     
-    # Add resource name
+    # Add resource name (same for both structures)
     $path .= "/$self->{name}";
     
     return $path;

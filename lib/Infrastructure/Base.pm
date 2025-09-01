@@ -38,6 +38,9 @@ sub new {
     $self->{dry_run} = $args{dry_run} || 0;
     $self->{verbose} = $args{verbose} || 0;
     $self->{force}   = $args{force} || 0;
+    $self->{envs_base} = $args{envs_base} || "envs";
+    $self->{projects_base} = $args{projects_base} || "projects";
+    $self->{structure_ordering} = $args{structure_ordering} || "environment_first";
     
     # Optional parameters (different for each type)
     $self->{env_name}    = $args{env_name} if defined $args{env_name};

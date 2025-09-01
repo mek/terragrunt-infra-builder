@@ -8,10 +8,27 @@ sub get_type {
     return 'env';
 }
 
-# Environments are created at the top level
+# Environments are created based on structure ordering
 sub get_target_path {
     my $self = shift;
-    return "$self->{workspace_root}/envs/$self->{name}";
+    
+    my $structure_order = $self->{structure_ordering} || "environment_first";
+    
+    
+    if ($structure_order eq "project_first" || $structure_order eq "project-first") {
+        # For project_first: projects/project/environment
+        if (!$self->{project_name}) {
+            die "Project name (-p) required when creating environment in project_first structure";
+        }
+        my $projects_base = $self->{projects_base} || "projects";
+        my $path = "$self->{workspace_root}/$projects_base/$self->{project_name}/$self->{name}";
+        return $path;
+    } else {
+        # Default: envs/environment
+        my $envs_base = $self->{envs_base} || "envs";
+        my $path = "$self->{workspace_root}/$envs_base/$self->{name}";
+        return $path;
+    }
 }
 
 # Environment-specific validation

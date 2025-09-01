@@ -41,6 +41,7 @@ my $dry_run = 0;
 my $force = 0;
 my $config_file = "admin/manage-config.yaml";
 my $config;
+my $workspace_structure;
 
 # Command line options
 GetOptions(
@@ -55,6 +56,7 @@ GetOptions(
     'resource-path=s' => \my $resource_path,
     'config|c=s'      => \my $json_config_file,
     'config-file=s'   => \my $config_file_override,
+    'structure-order=s' => \my $structure_order,
     'help|h'          => sub { print_help(); exit 0; }
 ) or die "Error in command line arguments\n";
 
@@ -74,6 +76,14 @@ sub main {
     
     # Validate workspace structure now that config is loaded
     validate_workspace_structure();
+    
+    # Normalize structure order (convert hyphens to underscores)
+    if ($structure_order) {
+        $structure_order =~ s/-/_/g;
+    }
+    
+    # Validate and detect directory structure ordering
+    $workspace_structure = validate_structure_consistency($structure_order);
     
     # Set template directory from config
     $template_dir = "$workspace_root/" . get_config_value("templates.base_path");
@@ -315,6 +325,121 @@ sub find_workspace_root {
     print "${GREEN}Workspace root: $workspace_root${NC}\n" if $verbose;
 }
 
+sub detect_workspace_structure {
+    my $lock_file = "$workspace_root/.terragrunt-structure.lock";
+    
+    # Check if structure is already locked
+    if (-f $lock_file) {
+        return read_structure_lock($lock_file);
+    }
+    
+    # Auto-detect based on existing directories
+    my $has_envs = -d "$workspace_root/envs" && directory_has_content("$workspace_root/envs");
+    my $has_projects = -d "$workspace_root/projects" && directory_has_content("$workspace_root/projects");
+    
+    my $detected_order;
+    if ($has_envs && !$has_projects) {
+        $detected_order = "environment_first";
+        print "${CYAN}Auto-detected structure: environment_first (envs/ directory found)${NC}\n" if $verbose;
+    } elsif ($has_projects && !$has_envs) {
+        $detected_order = "project_first";
+        print "${CYAN}Auto-detected structure: project_first (projects/ directory found)${NC}\n" if $verbose;
+    } elsif (!$has_envs && !$has_projects) {
+        # New workspace - use config default or flag
+        $detected_order = $structure_order || get_config_value("directories.structure_ordering") || "environment_first";
+        print "${CYAN}New workspace - using structure: $detected_order${NC}\n" if $verbose;
+    } else {
+        # Both exist - this is a problem!
+        die "${RED}ERROR: Both 'envs/' and 'projects/' directories exist with content. Please clean up or manually set structure lock.${NC}\n";
+    }
+    
+    # Write lock file
+    write_structure_lock($lock_file, $detected_order);
+    return $detected_order;
+}
+
+sub directory_has_content {
+    my $dir = shift;
+    return 0 unless -d $dir;
+    
+    opendir(my $dh, $dir) or return 0;
+    my @entries = grep { $_ ne '.' && $_ ne '..' } readdir($dh);
+    closedir($dh);
+    
+    return scalar(@entries) > 0;
+}
+
+sub read_structure_lock {
+    my $lock_file = shift;
+    
+    open my $fh, '<', $lock_file or die "Cannot read structure lock file $lock_file: $!";
+    my $content = do { local $/; <$fh> };
+    close $fh;
+    
+    my $lock_data = eval { decode_json($content) };
+    if ($@) {
+        die "${RED}ERROR: Invalid structure lock file format: $@${NC}\n";
+    }
+    
+    return $lock_data->{structure_ordering};
+}
+
+sub write_structure_lock {
+    my ($lock_file, $structure_order) = @_;
+    
+    my $timestamp = strftime "%Y-%m-%dT%H:%M:%SZ", gmtime;
+    
+    my $lock_data = {
+        structure_ordering => $structure_order,
+        created_timestamp => $timestamp,
+        last_verified => $timestamp,
+        detected_patterns => {
+            has_envs_dir => (-d "$workspace_root/envs") ? JSON::true : JSON::false,
+            has_projects_dir => (-d "$workspace_root/projects") ? JSON::true : JSON::false,
+        }
+    };
+    
+    open my $fh, '>', $lock_file or die "Cannot write structure lock file $lock_file: $!";
+    print $fh JSON->new->pretty->encode($lock_data);
+    close $fh;
+    
+    print "${GREEN}Created structure lock file: $structure_order${NC}\n" if $verbose;
+}
+
+sub validate_structure_consistency {
+    my ($requested_order) = @_;
+    my $current_structure = detect_workspace_structure();
+    
+    # Normalize both values for comparison (convert hyphens to underscores)
+    my $normalized_requested = $requested_order;
+    my $normalized_current = $current_structure;
+    if ($normalized_requested) {
+        $normalized_requested =~ s/-/_/g;
+    }
+    if ($normalized_current) {
+        $normalized_current =~ s/-/_/g;
+    }
+    
+    if ($requested_order && $normalized_requested ne $normalized_current) {
+        print "${RED}ERROR: Structure mismatch!${NC}\n";
+        print "  Current workspace structure: ${YELLOW}$current_structure${NC}\n";
+        print "  Requested structure: ${YELLOW}$requested_order${NC}\n";
+        print "  Use --force to override (not recommended)\n\n";
+        
+        if (!$force) {
+            print "To fix this:\n";
+            print "  1. Remove --structure-order flag to use current structure\n";
+            print "  2. Or use --force to override (may cause inconsistencies)\n";
+            print "  3. Or migrate structure using: manage.pl migrate-structure\n";
+            exit 1;
+        } else {
+            print "${YELLOW}WARNING: Forcing structure override. This may cause inconsistencies.${NC}\n";
+        }
+    }
+    
+    return $normalized_current;
+}
+
 sub parse_options {
     my %options;
     
@@ -371,7 +496,7 @@ sub execute_add {
         # For env, the name comes from the first remaining argument
         my $env_name = shift @ARGV;
         die "Environment name required" unless $env_name;
-        add_environment($env_name);
+        add_environment($env_name, $project_opt);
     }
     elsif ($target eq 'project') {
         # For project, the name comes from the first remaining argument
@@ -413,9 +538,14 @@ sub execute_add {
 }
 
 sub add_environment {
-    my $env_name = shift;
+    my ($env_name, $project_name) = @_;
     
     print "${CYAN}Adding environment: $env_name${NC}\n";
+    
+    if ($verbose) {
+        print "  Structure ordering: $workspace_structure\n";
+        print "  Project name: " . ($project_name || "none") . "\n";
+    }
     
     # Create environment using Infrastructure module
     my $env;
@@ -423,8 +553,12 @@ sub add_environment {
         $env = Infrastructure::Factory->create_infrastructure(
             type => 'environment',
             name => $env_name,
+            project_name => $project_name,
             workspace_root => $workspace_root,
             template_dir => $template_dir,
+            envs_base => get_config_value("directories.environments"),
+            projects_base => get_config_value("directories.projects"),
+            structure_ordering => $workspace_structure,
             dry_run => $dry_run,
             verbose => $verbose,
             force => $force,
@@ -618,18 +752,20 @@ sub add_resource {
     my $resource;
     eval {
         $resource = Resource::Factory->create_resource(
-            name           => $resource_name,
-            env_name       => $options{env},
-            region_name    => $options{region},
-            zone_name      => $options{zone},
-            project_name   => $options{project},
-            resource_type  => $options{resource_type},
-            workspace_root => $workspace_root,
-            template_dir   => $template_dir,
-            envs_base      => get_config_value("directories.environments"),
-            dry_run        => $dry_run,
-            verbose        => $verbose,
-            force          => $force,
+            name               => $resource_name,
+            env_name           => $options{env},
+            region_name        => $options{region},
+            zone_name          => $options{zone},
+            project_name       => $options{project},
+            resource_type      => $options{resource_type},
+            workspace_root     => $workspace_root,
+            template_dir       => $template_dir,
+            envs_base          => get_config_value("directories.environments"),
+            projects_base      => get_config_value("directories.projects"),
+            structure_ordering => $workspace_structure,
+            dry_run            => $dry_run,
+            verbose            => $verbose,
+            force              => $force,
         );
     };
     

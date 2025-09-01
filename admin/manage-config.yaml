@@ -8,6 +8,11 @@ directories:
   projects: "projects"
   modules: "modules"
   
+  # Top-level directory structure ordering
+  # Options: "environment_first" (envs/env/project/region/zone) or "project_first" (projects/project/env/region/zone)
+  # This is only used for NEW workspaces - existing workspaces use structure lock file
+  structure_ordering: "environment_first"
+  
   # Environment-specific directory structure
   environment_structure:
     # Where to place regional resources within an environment
