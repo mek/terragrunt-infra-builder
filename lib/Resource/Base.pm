@@ -306,7 +306,7 @@ sub get_template_variables {
     $vars{vpc_path} = $self->get_dependency_path('vpc');
     $vars{sg_path} = $self->get_dependency_path('security-group');
     
-    return %vars;
+    return \%vars;
 }
 
 # Process template file
@@ -319,11 +319,11 @@ sub process_template {
     close $in_fh;
     
     # Get variables
-    my %vars = $self->get_template_variables();
+    my $vars = $self->get_template_variables();
     
     # Replace variables
-    foreach my $key (keys %vars) {
-        my $value = $vars{$key};
+    foreach my $key (keys %{$vars}) {
+        my $value = $vars->{$key};
         $content =~ s/\{\{$key\}\}/$value/g;
     }
     
