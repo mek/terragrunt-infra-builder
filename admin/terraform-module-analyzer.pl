@@ -17,17 +17,9 @@ use Data::Dumper;
 use Cwd 'abs_path';
 use JSON;
 use POSIX qw(strftime);
+use lib '../lib';
+use Util::Color;
 # URI parsing handled manually
-
-# Color codes for output
-my $GREEN = "\033[0;32m";
-my $YELLOW = "\033[0;33m";
-my $RED = "\033[0;31m";
-my $BLUE = "\033[0;34m";
-my $CYAN = "\033[0;36m";
-my $MAGENTA = "\033[0;35m";
-my $BOLD = "\033[1m";
-my $NC = "\033[0m"; # No Color
 
 # Global variables
 my $workspace_root;
@@ -50,6 +42,9 @@ GetOptions(
 
 # Main execution
 sub main {
+    # Initialize colors
+    Util::Color::init_colors();
+    
     print "${BOLD}${GREEN}Terraform Module Analyzer${NC}\n";
     print "=" x 60 . "\n\n";
     

@@ -22,16 +22,7 @@ use POSIX qw(strftime);
 use Resource::Factory;
 use Resource::Base;
 use Infrastructure::Factory;
-
-# Color codes for output
-my $GREEN = "\033[0;32m";
-my $YELLOW = "\033[0;33m";
-my $RED = "\033[0;31m";
-my $BLUE = "\033[0;34m";
-my $CYAN = "\033[0;36m";
-my $MAGENTA = "\033[0;35m";
-my $BOLD = "\033[1m";
-my $NC = "\033[0m"; # No Color
+use Util::Color;
 
 # Global variables
 my $workspace_root;
@@ -62,6 +53,9 @@ GetOptions(
 
 # Main execution
 sub main {
+    # Initialize colors
+    Util::Color::init_colors();
+    
     print "${BOLD}${GREEN}Infrastructure Management Script${NC}\n";
     print "=" x 60 . "\n\n";
     
@@ -334,23 +328,25 @@ sub detect_workspace_structure {
     }
     
     # Auto-detect based on existing directories
-    my $has_envs = -d "$workspace_root/envs" && directory_has_content("$workspace_root/envs");
-    my $has_projects = -d "$workspace_root/projects" && directory_has_content("$workspace_root/projects");
+    my $envs_base = get_config_value("directories.environments");
+    my $projects_base = get_config_value("directories.projects");
+    my $has_envs = -d "$workspace_root/$envs_base" && directory_has_content("$workspace_root/$envs_base");
+    my $has_projects = -d "$workspace_root/$projects_base" && directory_has_content("$workspace_root/$projects_base");
     
     my $detected_order;
     if ($has_envs && !$has_projects) {
         $detected_order = "environment_first";
-        print "${CYAN}Auto-detected structure: environment_first (envs/ directory found)${NC}\n" if $verbose;
+        print "${CYAN}Auto-detected structure: environment_first ($envs_base/ directory found)${NC}\n" if $verbose;
     } elsif ($has_projects && !$has_envs) {
         $detected_order = "project_first";
-        print "${CYAN}Auto-detected structure: project_first (projects/ directory found)${NC}\n" if $verbose;
+        print "${CYAN}Auto-detected structure: project_first ($projects_base/ directory found)${NC}\n" if $verbose;
     } elsif (!$has_envs && !$has_projects) {
         # New workspace - use config default or flag
         $detected_order = $structure_order || get_config_value("directories.structure_ordering") || "environment_first";
         print "${CYAN}New workspace - using structure: $detected_order${NC}\n" if $verbose;
     } else {
         # Both exist - this is a problem!
-        die "${RED}ERROR: Both 'envs/' and 'projects/' directories exist with content. Please clean up or manually set structure lock.${NC}\n";
+        die "${RED}ERROR: Both '$envs_base/' and '$projects_base/' directories exist with content. Please clean up or manually set structure lock.${NC}\n";
     }
     
     # Write lock file
@@ -389,13 +385,16 @@ sub write_structure_lock {
     
     my $timestamp = strftime "%Y-%m-%dT%H:%M:%SZ", gmtime;
     
+    my $envs_base = get_config_value("directories.environments");
+    my $projects_base = get_config_value("directories.projects");
+    
     my $lock_data = {
         structure_ordering => $structure_order,
         created_timestamp => $timestamp,
         last_verified => $timestamp,
         detected_patterns => {
-            has_envs_dir => (-d "$workspace_root/envs") ? JSON::true : JSON::false,
-            has_projects_dir => (-d "$workspace_root/projects") ? JSON::true : JSON::false,
+            has_envs_dir => (-d "$workspace_root/$envs_base") ? JSON::true : JSON::false,
+            has_projects_dir => (-d "$workspace_root/$projects_base") ? JSON::true : JSON::false,
         }
     };
     

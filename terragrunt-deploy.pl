@@ -19,16 +19,7 @@ use Time::HiRes qw(time);
 use POSIX qw(strftime);
 use JSON;
 use API::Schema;
-
-# Color codes for output
-my $GREEN = "\033[0;32m";
-my $YELLOW = "\033[0;33m";
-my $RED = "\033[0;31m";
-my $BLUE = "\033[0;34m";
-my $CYAN = "\033[0;36m";
-my $MAGENTA = "\033[0;35m";
-my $BOLD = "\033[1m";
-my $NC = "\033[0m"; # No Color
+use Util::Color;
 
 # Global variables
 my %modules;
@@ -80,6 +71,9 @@ GetOptions(
 
 # Main execution
 sub main {
+    # Initialize colors
+    Util::Color::init_colors();
+    
     print "${BOLD}${GREEN}Terragrunt Intelligent Deployment System${NC}\n";
     print "=" x 60 . "\n\n";
     

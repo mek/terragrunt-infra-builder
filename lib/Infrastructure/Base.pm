@@ -10,16 +10,7 @@ use warnings;
 use File::Path qw(make_path);
 use File::Copy qw(copy);
 use File::Basename;
-
-# Color codes for output
-our $GREEN = "\033[0;32m";
-our $YELLOW = "\033[0;33m";
-our $RED = "\033[0;31m";
-our $BLUE = "\033[0;34m";
-our $CYAN = "\033[0;36m";
-our $MAGENTA = "\033[0;35m";
-our $BOLD = "\033[1m";
-our $NC = "\033[0m"; # No Color
+use Util::Color;
 
 # Base class for Environment, Project, Region, Zone creation
 
