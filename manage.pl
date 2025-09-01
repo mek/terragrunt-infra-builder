@@ -48,6 +48,7 @@ GetOptions(
     'config|c=s'      => \my $json_config_file,
     'config-file=s'   => \my $config_file_override,
     'structure-order=s' => \my $structure_order,
+    'generate-inputs' => \my $generate_inputs,
     'help|h'          => sub { print_help(); exit 0; }
 ) or die "Error in command line arguments\n";
 
@@ -178,6 +179,7 @@ Options:
     -v, --verbose        Verbose output
     --dry-run            Show what would be done without executing
     -f, --force          Force overwrite of existing files
+    --generate-inputs    Generate inputs.json file from terraform module analysis
     -h, --help           Show this help message
 
 Examples:
@@ -765,6 +767,7 @@ sub add_resource {
             dry_run            => $dry_run,
             verbose            => $verbose,
             force              => $force,
+            generate_inputs    => $generate_inputs,
         );
     };
     

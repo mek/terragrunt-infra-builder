@@ -285,6 +285,10 @@ locals {
   environment = local.env_vars.locals.environment
   aws_region = local.region_vars.locals.aws_region
   zone = "{{zone_name}}"
+  
+  # Load inputs from inputs.json if it exists, otherwise use empty map
+  inputs_file_exists = fileexists("\${get_terragrunt_dir()}/inputs.json")
+  external_inputs = local.inputs_file_exists ? jsondecode(file("\${get_terragrunt_dir()}/inputs.json")) : {}
 }
 
 terraform {
@@ -307,7 +311,9 @@ EOF
     $content .= <<EOF;
 }
 
-inputs = {
+inputs = merge(
+  # Default inputs - these can be overridden by inputs.json
+  {
 EOF
 
     # Handle external-vpc specifically
@@ -391,7 +397,12 @@ EOF
     }
     
     $content .= <<EOF;
-}
+  },
+  
+  # External inputs from inputs.json (if it exists)
+  # These take precedence over the defaults above
+  local.external_inputs
+)
 
 # TODO: Add dependencies as needed
 # dependency "vpc" {

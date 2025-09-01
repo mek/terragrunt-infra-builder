@@ -40,6 +40,7 @@ sub new {
     $self->{dry_run}   = $args{dry_run} || 0;
     $self->{verbose}   = $args{verbose} || 0;
     $self->{force}     = $args{force} || 0;
+    $self->{generate_inputs} = $args{generate_inputs} || 0;
     
     # Optional parameters
     $self->{region_name}   = $args{region_name} if defined $args{region_name};
@@ -418,6 +419,9 @@ sub create {
     # Generate deploy.pl file for terragrunt-deploy.pl integration
     $self->generate_deploy_file();
     
+    # Generate inputs.json file if requested
+    $self->generate_inputs_json() if $self->{generate_inputs};
+    
     # Run any post-creation hooks
     $self->post_create();
     
@@ -451,6 +455,64 @@ sub generate_deploy_file {
     
     if ($@) {
         warn "  Warning: Failed to generate deploy.pl file: $@\n";
+    }
+}
+
+# Generate inputs.json file by calling the terraform module analyzer
+sub generate_inputs_json {
+    my $self = shift;
+    
+    print "  Generating inputs.json file from terraform module analysis\n" if $self->{verbose};
+    
+    my $resource_path = $self->get_resource_path();
+    my $terragrunt_file = "$resource_path/terragrunt.hcl";
+    my $inputs_file = "$resource_path/inputs.json";
+    
+    # Check if terragrunt.hcl exists
+    unless (-f $terragrunt_file) {
+        warn "  Warning: terragrunt.hcl not found at $terragrunt_file\n";
+        return;
+    }
+    
+    # Check if inputs.json already exists and warn user
+    if (-f $inputs_file && !$self->{force}) {
+        print "  ℹ inputs.json already exists at $inputs_file\n";
+        print "  ℹ Use --force to overwrite existing inputs.json files\n";
+        return;
+    }
+    
+    # Call the terraform module analyzer for this specific resource
+    my $analyzer_script = "$self->{workspace_root}/admin/terraform-module-analyzer.pl";
+    unless (-f $analyzer_script) {
+        warn "  Warning: terraform-module-analyzer.pl not found\n";
+        return;
+    }
+    
+    # Run full module analyzer (it will generate inputs.json for all resources including this one)
+    my $cmd = "cd '$self->{workspace_root}' && perl '$analyzer_script'";
+    
+    if ($self->{dry_run}) {
+        print "  [DRY RUN] Would run: $cmd\n";
+        return;
+    }
+    
+    eval {
+        my $result = `$cmd 2>&1`;
+        if ($? != 0) {
+            warn "  Warning: Module analyzer failed: $result\n";
+        } else {
+            # Check if inputs.json was created for this resource
+            my $inputs_file = "$resource_path/inputs.json";
+            if (-f $inputs_file) {
+                print "  ✓ inputs.json generated at $inputs_file\n" if $self->{verbose};
+            } else {
+                print "  ℹ Module analyzer completed, but no inputs.json generated for this resource\n" if $self->{verbose};
+            }
+        }
+    };
+    
+    if ($@) {
+        warn "  Warning: Failed to run module analyzer: $@\n";
     }
 }
 

@@ -582,6 +582,13 @@ sub generate_inputs_files {
         
         if ($inputs) {
             my $inputs_file = "$dir/inputs.json";
+            
+            # Check if file already exists and skip unless force is used
+            if (-f $inputs_file && !$force) {
+                print "    Skipped: $inputs_file (already exists, use --force to overwrite)\n";
+                next;
+            }
+            
             if (!$dry_run) {
                 open(my $fh, '>', $inputs_file) or do {
                     warn "    ${YELLOW}Warning: Cannot write $inputs_file: $!${NC}\n";

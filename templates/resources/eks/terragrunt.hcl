@@ -25,6 +25,10 @@ locals {
   environment = local.env_vars.locals.environment
   aws_region = local.region_vars.locals.aws_region
   zone = "{{zone_name}}"
+  
+  # Load inputs from inputs.json if it exists, otherwise use empty map
+  inputs_file_exists = fileexists("${get_terragrunt_dir()}/inputs.json")
+  external_inputs = local.inputs_file_exists ? jsondecode(file("${get_terragrunt_dir()}/inputs.json")) : {}
 }
 
 terraform {
@@ -34,30 +38,36 @@ terraform {
   # source = "../../modules/eks"
 }
 
-inputs = {
-  # Standard naming convention
-  name = "{{full_name}}"
+inputs = merge(
+  # Default inputs - these can be overridden by inputs.json
+  {
+    # Standard naming convention
+    name = "{{full_name}}"
+    
+    # Common tags applied to all resources
+    tags = {
+      Environment = local.environment
+      Region      = local.aws_region
+      Zone        = local.zone
+      ManagedBy   = "Terragrunt"
+      Resource    = "{{resource_name}}"
+      Type        = "eks"
+      Category    = "compute"
+    }
+    
+    # TODO: Add eks-specific default configuration here
+    # These can be overridden in inputs.json
+    
+    # Common AWS resource settings
+    # vpc_id = dependency.vpc.outputs.vpc_id
+    # subnet_ids = dependency.vpc.outputs.private_subnets
+    # security_group_ids = [dependency.security_group.outputs.security_group_id]
+  },
   
-  # Common tags applied to all resources
-  tags = {
-    Environment = local.environment
-    Region      = local.aws_region
-    Zone        = local.zone
-    ManagedBy   = "Terragrunt"
-    Resource    = "{{resource_name}}"
-    Type        = "eks"
-    Category    = "compute"
-  }
-  
-  # TODO: Add eks-specific configuration here
-  # Refer to inputs.json for available variables
-  # Example configurations:
-  
-  # Common AWS resource settings
-  # vpc_id = dependency.vpc.outputs.vpc_id
-  # subnet_ids = dependency.vpc.outputs.private_subnets
-  # security_group_ids = [dependency.security_group.outputs.security_group_id]
-}
+  # External inputs from inputs.json (if it exists)
+  # These take precedence over the defaults above
+  local.external_inputs
+)
 
 # TODO: Add dependencies as needed
 # dependency "vpc" {
