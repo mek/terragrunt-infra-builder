@@ -23,9 +23,10 @@ my $BLUE = BLUE;
 my $CYAN = CYAN;
 my $NC = RESET;
 
-# Test configuration
-my $test_dir = "$FindBin::Bin/t";
-my $lib_dir = "$FindBin::Bin/lib";
+# Test configuration - paths relative to project root
+my $project_root = dirname($FindBin::Bin);
+my $test_dir = "$project_root/t";
+my $lib_dir = "$project_root/lib";
 
 # Add lib to @INC
 unshift @INC, $lib_dir;

@@ -7,24 +7,24 @@ This document explains how to use Docker to run the Terragrunt Infrastructure Ma
 ### Option 1: Using the convenient script (Recommended)
 ```bash
 # Build and run interactively
-./docker-run.sh --build
+./docker/docker-run.sh --build
 
 # Run with AWS credentials from environment
 export AWS_ACCESS_KEY_ID=your-key
 export AWS_SECRET_ACCESS_KEY=your-secret
 export AWS_REGION=us-east-1
-./docker-run.sh
+./docker/docker-run.sh
 
 # Run with AWS credentials from ~/.aws directory
-./docker-run.sh --aws-dir
+./docker/docker-run.sh --aws-dir
 
 # Run a specific command
-./docker-run.sh './manage.pl list env'
+./docker/docker-run.sh './manage.pl list env'
 ```
 
 ### Option 2: Using Docker Compose
 ```bash
-# Edit docker-compose.yml to uncomment AWS credential mounts
+# Edit docker/docker-compose.yml to uncomment AWS credential mounts
 # Then run:
 docker-compose up -d terragrunt-manager
 docker-compose exec terragrunt-manager bash
@@ -73,17 +73,17 @@ The Docker image includes:
 export AWS_ACCESS_KEY_ID=AKIA...
 export AWS_SECRET_ACCESS_KEY=...
 export AWS_REGION=us-east-1
-./docker-run.sh
+./docker/docker-run.sh
 ```
 
 ### Method 2: AWS Directory Mount
 ```bash
 # Mounts your ~/.aws directory read-only
-./docker-run.sh --aws-dir
+./docker/docker-run.sh --aws-dir
 ```
 
 ### Method 3: Docker Compose Configuration
-Edit `docker-compose.yml` and uncomment:
+Edit `docker/docker-compose.yml` and uncomment:
 ```yaml
 volumes:
   - ~/.aws:/home/terragrunt/.aws:ro
@@ -97,39 +97,39 @@ When running on AWS infrastructure, the container will automatically use instanc
 ### Interactive Development
 ```bash
 # Start development environment with debug logging
-./docker-run.sh --build --dev
+./docker/docker-run.sh --build --dev
 
 # Inside container:
 ./manage.pl add env testing
 ./manage.pl add resource vpc -e testing -r us-west-2
-./terragrunt-deploy.pl --list
+./bin/terragrunt-deploy.pl --list
 ```
 
 ### Running Specific Commands
 ```bash
 # List available resource types
-./docker-run.sh './manage.pl list resources'
+./docker/docker-run.sh './manage.pl list resources'
 
 # Create infrastructure from config
-./docker-run.sh './manage.pl add --config infrastructure.json'
+./docker/docker-run.sh './manage.pl add --config infrastructure.json'
 
 # Run deployment
-./docker-run.sh './terragrunt-deploy.pl -d envs/testing/h2g2'
+./docker/docker-run.sh './bin/terragrunt-deploy.pl -d envs/testing/h2g2'
 
 # Check Terraform/Terragrunt versions
-./docker-run.sh 'terraform version && terragrunt --version'
+./docker/docker-run.sh 'terraform version && terragrunt --version'
 ```
 
 ### AWS Operations
 ```bash
 # Test AWS connectivity
-./docker-run.sh 'aws sts get-caller-identity'
+./docker/docker-run.sh 'aws sts get-caller-identity'
 
 # List S3 buckets
-./docker-run.sh 'aws s3 ls'
+./docker/docker-run.sh 'aws s3 ls'
 
 # Check EKS clusters
-./docker-run.sh 'aws eks list-clusters --region us-east-1'
+./docker/docker-run.sh 'aws eks list-clusters --region us-east-1'
 ```
 
 ## 🚀 Development Workflow
@@ -137,7 +137,7 @@ When running on AWS infrastructure, the container will automatically use instanc
 ### 1. Initial Setup
 ```bash
 # Build the development image
-./docker-run.sh --build --dev
+./docker/docker-run.sh --build --dev
 
 # Create test infrastructure
 ./manage.pl add env development
@@ -155,19 +155,19 @@ When running on AWS infrastructure, the container will automatically use instanc
 ./admin/terraform-module-analyzer.pl
 
 # Deploy infrastructure  
-./terragrunt-deploy.pl -d envs/development/web-app/us-west-2 --plan
+./bin/terragrunt-deploy.pl -d envs/development/web-app/us-west-2 --plan
 ```
 
 ### 3. Testing and Validation
 ```bash
 # Run tests
-./run_tests.pl
+./bin/run_tests.pl
 
 # Validate configuration
 ./manage.pl add resource test-vpc -e test-env -r us-east-1 --dry-run
 
 # Check deployment status
-./terragrunt-deploy.pl -d envs/development --list
+./bin/terragrunt-deploy.pl -d envs/development --list
 ```
 
 ## 🔧 Docker Script Options
@@ -175,7 +175,7 @@ When running on AWS infrastructure, the container will automatically use instanc
 The `docker-run.sh` script supports various options:
 
 ```bash
-./docker-run.sh [OPTIONS] [COMMAND]
+./docker/docker-run.sh [OPTIONS] [COMMAND]
 
 Options:
   -b, --build              Build the Docker image before running
@@ -213,22 +213,22 @@ docker build -t terragrunt-infra-manager . 2>&1 | tee build.log
 ### AWS Authentication Issues
 ```bash
 # Test AWS credentials inside container
-./docker-run.sh 'aws sts get-caller-identity'
+./docker/docker-run.sh 'aws sts get-caller-identity'
 
 # Check mounted credentials
-./docker-run.sh 'ls -la ~/.aws/'
+./docker/docker-run.sh 'ls -la ~/.aws/'
 
 # Verify environment variables
-./docker-run.sh 'env | grep AWS'
+./docker/docker-run.sh 'env | grep AWS'
 ```
 
 ### Permission Issues
 ```bash
 # Check file permissions
-ls -la docker-run.sh
+ls -la docker/docker-run.sh
 
 # Make script executable
-chmod +x docker-run.sh
+chmod +x docker/docker-run.sh
 
 # Check Docker daemon
 docker info
@@ -237,13 +237,13 @@ docker info
 ### Perl Module Issues
 ```bash
 # Test Perl environment
-./docker-run.sh 'perl -c manage.pl'
+./docker/docker-run.sh 'perl -c manage.pl'
 
 # Check installed modules
-./docker-run.sh 'perl -MYAML::Tiny -e "print \"YAML::Tiny OK\n\""'
+./docker/docker-run.sh 'perl -MYAML::Tiny -e "print \"YAML::Tiny OK\n\""'
 
 # Install additional modules
-./docker-run.sh 'cpanm Module::Name'
+./docker/docker-run.sh 'cpanm Module::Name'
 ```
 
 ### Performance Optimization
@@ -272,13 +272,13 @@ DOCKER_BUILDKIT=1 docker build -t terragrunt-infra-manager .
 ### Updating Tools
 ```bash
 # Rebuild to get latest versions
-./docker-run.sh --build
+./docker/docker-run.sh --build
 
 # Update Terraform
-./docker-run.sh 'tfenv install latest && tfenv use latest'
+./docker/docker-run.sh 'tfenv install latest && tfenv use latest'
 
 # Update Terragrunt  
-./docker-run.sh 'tgenv install latest && tgenv use latest'
+./docker/docker-run.sh 'tgenv install latest && tgenv use latest'
 
 # Update AWS CLI (requires rebuild)
 ```

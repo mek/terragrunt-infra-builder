@@ -30,7 +30,7 @@ my $template_dir;
 my $verbose = 0;
 my $dry_run = 0;
 my $force = 0;
-my $config_file = "admin/manage-config.yaml";
+my $config_file = "config/manage-config.yaml";
 my $config;
 my $workspace_structure;
 
@@ -174,7 +174,7 @@ Options:
     --resource-type <type> Resource type (eks, vpc, rds, etc.)
     --resource-path <path> Full path for resource placement
     -c, --config <file>  JSON configuration file for bulk operations
-    --config-file <file> Script configuration file (default: admin/manage-config.yaml)
+    --config-file <file> Script configuration file (default: config/manage-config.yaml)
     -v, --verbose        Verbose output
     --dry-run            Show what would be done without executing
     -f, --force          Force overwrite of existing files
@@ -249,7 +249,7 @@ sub load_configuration {
                 }
             },
             templates => {
-                base_path => "admin/templates",
+                base_path => "templates",
                 environment => "env",
                 region => "region",
                 zone => "zone",

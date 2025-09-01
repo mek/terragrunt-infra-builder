@@ -141,14 +141,14 @@ log_info "Starting Terragrunt Infrastructure Management System"
 # Build image if requested
 if [[ "$BUILD_IMAGE" == true ]]; then
     log_info "Building Docker image: $IMAGE_NAME:$TAG"
-    docker build -t "$IMAGE_NAME:$TAG" .
+    docker build -t "$IMAGE_NAME:$TAG" -f ./Dockerfile ..
     log_success "Image built successfully"
 fi
 
 # Check if image exists
 if ! docker image inspect "$IMAGE_NAME:$TAG" >/dev/null 2>&1; then
     log_warning "Image $IMAGE_NAME:$TAG not found. Building it now..."
-    docker build -t "$IMAGE_NAME:$TAG" .
+    docker build -t "$IMAGE_NAME:$TAG" -f ./Dockerfile ..
     log_success "Image built successfully"
 fi
 

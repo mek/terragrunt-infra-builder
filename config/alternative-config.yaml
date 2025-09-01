@@ -28,7 +28,7 @@ directories:
 # Template configuration
 templates:
   # Base directory for templates
-  base_path: "admin/templates"
+  base_path: "templates"
   
   # Template subdirectories for each resource type
   environment: "env"

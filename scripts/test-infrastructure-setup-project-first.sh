@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Test Infrastructure Setup Script (Environment-First Structure)
+# Test Infrastructure Setup Script (Project-First Structure)
 # This script creates a complete test environment with EKS cluster and associated resources
-# Structure: envs/environment/project/region/zone/resource
+# Structure: projects/project/environment/region/zone/resource
 # 
 # Copyright (c) 2017-2025 Mat Kovach <mek@mek.cc>
 # Licensed under the MIT License - see LICENSE file for details
@@ -29,7 +29,7 @@ CLUSTER_NAME="be-cool"
 AVAILABILITY_ZONES=("a" "b" "c")
 
 echo -e "${GREEN}===============================================${NC}"
-echo -e "${GREEN}Infrastructure Test Setup Script${NC}"
+echo -e "${GREEN}Infrastructure Test Setup Script (Project-First)${NC}"
 echo -e "${GREEN}===============================================${NC}"
 echo ""
 echo -e "${BLUE}Configuration:${NC}"
@@ -64,12 +64,12 @@ echo "=========================================="
 # Create external VPC configuration (environment level)
 run_manage_command \
     "Creating external VPC configuration" \
-    "./manage.pl add resource \"client-vpc:external-vpc\" -e ${ENV}"
+    "./manage.pl --structure-order=project-first add resource \"client-vpc:external-vpc\" -e ${ENV} -p ${PROJECT}"
 
 # Create external S3 backend configuration (environment level)
 run_manage_command \
     "Creating external S3 backend configuration" \
-    "./manage.pl add resource \"company-backend:external-s3-backend\" -e ${ENV}"
+    "./manage.pl --structure-order=project-first add resource \"company-backend:external-s3-backend\" -e ${ENV} -p ${PROJECT}"
 
 echo -e "${GREEN}Step 2: Creating IAM Roles${NC}"
 echo "=========================================="
@@ -77,17 +77,17 @@ echo "=========================================="
 # Create EKS cluster service role
 run_manage_command \
     "Creating EKS cluster service role" \
-    "./manage.pl add resource \"eks-cluster-role:iam-role\" -e ${ENV} -p ${PROJECT}"
+    "./manage.pl --structure-order=project-first add resource \"eks-cluster-role:iam-role\" -e ${ENV} -p ${PROJECT}"
 
 # Create EKS node group role  
 run_manage_command \
     "Creating EKS node group role" \
-    "./manage.pl add resource \"eks-node-role:iam-role\" -e ${ENV} -p ${PROJECT}"
+    "./manage.pl --structure-order=project-first add resource \"eks-node-role:iam-role\" -e ${ENV} -p ${PROJECT}"
 
 # Create EKS pod execution role
 run_manage_command \
     "Creating EKS pod execution role" \
-    "./manage.pl add resource \"eks-pod-role:iam-role\" -e ${ENV} -p ${PROJECT}"
+    "./manage.pl --structure-order=project-first add resource \"eks-pod-role:iam-role\" -e ${ENV} -p ${PROJECT}"
 
 echo -e "${GREEN}Step 3: Creating Region Structure${NC}"
 echo "=========================================="
@@ -95,13 +95,13 @@ echo "=========================================="
 # Create region directory structure
 run_manage_command \
     "Creating ${REGION} region" \
-    "./manage.pl add region ${REGION} -e ${ENV} -p ${PROJECT}"
+    "./manage.pl --structure-order=project-first add region ${REGION} -e ${ENV} -p ${PROJECT}"
 
 # Create availability zones
 for zone in "${AVAILABILITY_ZONES[@]}"; do
     run_manage_command \
         "Creating availability zone ${REGION}${zone}" \
-        "./manage.pl add zone ${REGION}${zone} -e ${ENV} -p ${PROJECT} -r ${REGION}"
+        "./manage.pl --structure-order=project-first add zone ${REGION}${zone} -e ${ENV} -p ${PROJECT} -r ${REGION}"
 done
 
 echo -e "${GREEN}Step 4: Creating Security Group${NC}"
@@ -110,7 +110,7 @@ echo "=========================================="
 # Create EKS cluster security group
 run_manage_command \
     "Creating EKS cluster security group" \
-    "./manage.pl add resource \"eks-cluster-security-group:security-group\" -e ${ENV} -p ${PROJECT} -r ${REGION}"
+    "./manage.pl --structure-order=project-first add resource \"eks-cluster-security-group:security-group\" -e ${ENV} -p ${PROJECT} -r ${REGION}"
 
 echo -e "${GREEN}Step 5: Creating EKS Cluster${NC}"
 echo "=========================================="
@@ -119,7 +119,7 @@ echo "=========================================="
 for zone in "${AVAILABILITY_ZONES[@]}"; do
     run_manage_command \
         "Creating EKS cluster '${CLUSTER_NAME}'" \
-        "./manage.pl add resource \"${CLUSTER_NAME}:eks\" -e ${ENV} -p ${PROJECT} -r ${REGION} -z ${REGION}${zone}"
+        "./manage.pl --structure-order=project-first add resource \"${CLUSTER_NAME}:eks\" -e ${ENV} -p ${PROJECT} -r ${REGION} -z ${REGION}${zone}"
 done
 
 echo -e "${GREEN}Step 6: Verification${NC}"
@@ -127,21 +127,21 @@ echo "=========================================="
 
 echo -e "${BLUE}Checking created directory structure:${NC}"
 
-# Check if all expected directories were created
+# Check if all expected directories were created (project-first structure)
 EXPECTED_DIRS=(
-    "envs/${ENV}/${PROJECT}/client-vpc"
-    "envs/${ENV}/${PROJECT}/company-backend"
-    "envs/${ENV}/${PROJECT}/eks-cluster-role"
-    "envs/${ENV}/${PROJECT}/eks-node-role" 
-    "envs/${ENV}/${PROJECT}/eks-pod-role"
-    "envs/${ENV}/${PROJECT}/${REGION}"
-    "envs/${ENV}/${PROJECT}/${REGION}/eks-cluster-security-group"
-    "envs/${ENV}/${PROJECT}/${REGION}/${REGION}a"
-    "envs/${ENV}/${PROJECT}/${REGION}/${REGION}b"
-    "envs/${ENV}/${PROJECT}/${REGION}/${REGION}c"
-    "envs/${ENV}/${PROJECT}/${REGION}/${REGION}a/${CLUSTER_NAME}"
-    "envs/${ENV}/${PROJECT}/${REGION}/${REGION}b/${CLUSTER_NAME}"
-    "envs/${ENV}/${PROJECT}/${REGION}/${REGION}c/${CLUSTER_NAME}"
+    "projects/${PROJECT}/${ENV}/client-vpc"
+    "projects/${PROJECT}/${ENV}/company-backend"
+    "projects/${PROJECT}/${ENV}/eks-cluster-role"
+    "projects/${PROJECT}/${ENV}/eks-node-role" 
+    "projects/${PROJECT}/${ENV}/eks-pod-role"
+    "projects/${PROJECT}/${ENV}/${REGION}"
+    "projects/${PROJECT}/${ENV}/${REGION}/eks-cluster-security-group"
+    "projects/${PROJECT}/${ENV}/${REGION}/${REGION}a"
+    "projects/${PROJECT}/${ENV}/${REGION}/${REGION}b"
+    "projects/${PROJECT}/${ENV}/${REGION}/${REGION}c"
+    "projects/${PROJECT}/${ENV}/${REGION}/${REGION}a/${CLUSTER_NAME}"
+    "projects/${PROJECT}/${ENV}/${REGION}/${REGION}b/${CLUSTER_NAME}"
+    "projects/${PROJECT}/${ENV}/${REGION}/${REGION}c/${CLUSTER_NAME}"
 )
 
 echo ""
@@ -155,8 +155,8 @@ done
 
 echo ""
 echo -e "${BLUE}Listing complete directory structure:${NC}"
-if [ -d "envs/${ENV}/${PROJECT}" ]; then
-    tree "envs/${ENV}/${PROJECT}" 2>/dev/null || find "envs/${ENV}/${PROJECT}" -type d | sort
+if [ -d "projects/${PROJECT}/${ENV}" ]; then
+    tree "projects/${PROJECT}/${ENV}" 2>/dev/null || find "projects/${PROJECT}/${ENV}" -type d | sort
 else
     echo -e "${RED}Project directory not found!${NC}"
 fi
@@ -172,7 +172,7 @@ echo "2. Customize IAM role policies and EKS cluster configuration"
 echo "3. Run terraform-module-analyzer to generate inputs.json files:"
 echo -e "   ${YELLOW}./admin/terraform-module-analyzer.pl${NC}"
 echo "4. Deploy resources using terragrunt-deploy.pl:"
-echo -e "   ${YELLOW}./terragrunt-deploy.pl -d envs/${ENV}/${PROJECT}${NC}"
+echo -e "   ${YELLOW}./bin/terragrunt-deploy.pl -d projects/${PROJECT}/${ENV}${NC}"
 echo ""
 echo -e "${BLUE}Created Resources:${NC}"
 echo "• External Infrastructure: client-vpc (external VPC), company-backend (external S3 backend)"
@@ -182,8 +182,8 @@ echo "• Security Group: eks-cluster-security-group"
 echo "• EKS Cluster: ${CLUSTER_NAME}"
 echo ""
 echo -e "${YELLOW}Important Configuration Steps:${NC}"
-echo "1. Configure external VPC details in: envs/${ENV}/client-vpc/vpc-config.json"
-echo "2. Configure external backend details in: envs/${ENV}/company-backend/backend-config.json"
+echo "1. Configure external VPC details in: projects/${PROJECT}/${ENV}/client-vpc/vpc-config.json"
+echo "2. Configure external backend details in: projects/${PROJECT}/${ENV}/company-backend/backend-config.json"
 echo "3. Remember to configure dependencies between resources in their terragrunt.hcl files"
 echo ""
 echo -e "${BLUE}External Configuration Files:${NC}"
