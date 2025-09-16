@@ -13,19 +13,27 @@ use File::Basename;
 use Getopt::Long;
 use POSIX qw(strftime);
 use JSON;
+use YAML::Tiny;
+use Cwd 'abs_path';
 use lib '../lib';
 use Resource::Factory;
 use Util::Color;
 
+# Global variables
+my $workspace_root;
+my $template_dir;
+my $config_file = "config/manage-config.yaml";
+my $config;
+
 # Command line options
 my $resource_type;
-my $template_dir = "admin/templates";
 my $verbose = 0;
 my $force = 0;
 
 GetOptions(
     'type|t=s'       => \$resource_type,
-    'template-dir=s' => \$template_dir,
+    'template-dir=s' => \$template_dir,  # Can still override
+    'config-file=s'  => \my $config_file_override,
     'verbose|v'      => \$verbose,
     'force|f'        => \$force,
     'help|h'         => sub { print_help(); exit 0; }
@@ -35,9 +43,24 @@ GetOptions(
 sub main {
     # Initialize colors
     Util::Color::init_colors();
-    
+
     print "${BOLD}${GREEN}AWS Resource Template Generator${NC}\n";
     print "=" x 60 . "\n\n";
+
+    # Find workspace root
+    find_workspace_root();
+
+    # Load configuration
+    if ($config_file_override) {
+        $config_file = $config_file_override;
+    }
+    load_configuration();
+
+    # Set template directory from config (unless overridden)
+    if (!$template_dir) {
+        $template_dir = "$workspace_root/" . get_config_value("templates.base_path");
+    }
+    print "${CYAN}Using template directory: $template_dir${NC}\n" if $verbose;
     
     if (!$resource_type) {
         print "${RED}Error: Resource type required${NC}\n\n";
@@ -85,7 +108,8 @@ Usage: ./admin/create-resource-template.pl -t <resource_type> [OPTIONS]
 
 Options:
     -t, --type <type>       AWS resource type to create template for
-    --template-dir <dir>    Template directory (default: admin/templates)
+    --template-dir <dir>    Override template directory (default: from config)
+    --config-file <file>    Configuration file (default: config/manage-config.yaml)
     -v, --verbose           Verbose output
     -f, --force             Force overwrite existing template
     -h, --help              Show this help message
@@ -900,6 +924,93 @@ sub print_next_steps {
     print "4. Deploy when ready:\n";
     print "   ${CYAN}./manage.pl add resource \"$resource_type\" -e dev -r us-west-2${NC}\n";
     print "\n${YELLOW}Template location: $template_dir/resources/$resource_type/${NC}\n";
+}
+
+# Helper functions from manage.pl for configuration handling
+
+sub find_workspace_root {
+    my $current_dir = abs_path('.');
+
+    # Look for terragrunt.hcl in current directory or parents
+    my $dir = $current_dir;
+    while ($dir ne '/') {
+        if (-f "$dir/terragrunt.hcl") {
+            $workspace_root = $dir;
+            last;
+        }
+        $dir = dirname($dir);
+    }
+
+    if (!$workspace_root) {
+        die "${RED}Error: Could not find workspace root (no terragrunt.hcl found)${NC}\n";
+    }
+
+    print "${GREEN}Workspace root: $workspace_root${NC}\n" if $verbose;
+}
+
+sub load_configuration {
+    # Load configuration file
+    if (-f $config_file) {
+        eval {
+            $config = YAML::Tiny->read($config_file);
+            $config = $config->[0];  # YAML::Tiny returns array reference
+        };
+        if ($@) {
+            die "${RED}Error loading configuration file: $@${NC}\n";
+        }
+        print "${GREEN}Configuration loaded from: $config_file${NC}\n" if $verbose;
+    } else {
+        # Use default configuration (same as manage.pl)
+        $config = {
+            directories => {
+                environments => "envs",
+                projects => "projects",
+                modules => "modules",
+                environment_structure => {
+                    regional_placement => "direct",
+                    default_project => "h2g2",
+                }
+            },
+            templates => {
+                base_path => "templates",
+                environment => "env",
+                region => "region",
+                zone => "zone",
+                project => "project"
+            },
+            files => {
+                environment => "env.hcl",
+                region => "region.hcl",
+                project => "project.hcl",
+                terragrunt => "terragrunt.hcl"
+            },
+            zones => {
+                allowed => {
+                    "us-east-1" => "ohio",
+                    "us-west-2" => "oregon",
+                    "us-west-1" => "california",
+                    "eu-west-1" => "ireland",
+                    "eu-central-1" => "frankfurt",
+                    "ap-southeast-1" => "singapore",
+                    "ap-northeast-1" => "tokyo"
+                }
+            }
+        };
+        print "${YELLOW}Using default configuration (no config file found)${NC}\n" if $verbose;
+    }
+}
+
+sub get_config_value {
+    my ($path) = @_;
+    my @keys = split(/\./, $path);
+    my $value = $config;
+
+    foreach my $key (@keys) {
+        return undef unless defined $value && ref($value) eq 'HASH';
+        $value = $value->{$key};
+    }
+
+    return $value;
 }
 
 # Run main

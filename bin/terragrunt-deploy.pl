@@ -20,6 +20,7 @@ use POSIX qw(strftime);
 use JSON;
 use API::Schema;
 use Util::Color;
+use YAML::Tiny;
 
 # Global variables
 my %modules;
@@ -28,6 +29,8 @@ my $root_dir = abs_path('.');
 my %execution_times;
 my $start_time = time();
 my @modules_with_outputs;
+my $config_file = 'config/manage-config.yaml';
+my $config;
 
 # Command line options
 my $directory_filter = '';
@@ -45,6 +48,7 @@ my $force = 0;
 my $output_format = 'text'; # text, json, yaml
 my $show_outputs = 0;
 my $output_module = '';
+my $config_file_override = '';
 
 # Support positional argument as directory alias
 if (@ARGV && $ARGV[0] !~ /^-/) {
@@ -66,6 +70,7 @@ GetOptions(
     'force|f'     => \$force,
     'format=s'    => \$output_format,
     'output|o=s'  => \$output_module,
+    'config-file=s' => \$config_file_override,
     'help|h'      => sub { print_help(); exit 0; }
 ) or die "Error in command line arguments\n";
 
@@ -73,10 +78,16 @@ GetOptions(
 sub main {
     # Initialize colors
     Util::Color::init_colors();
-    
+
     print "${BOLD}${GREEN}Terragrunt Intelligent Deployment System${NC}\n";
     print "=" x 60 . "\n\n";
-    
+
+    # Load configuration
+    if ($config_file_override) {
+        $config_file = $config_file_override;
+    }
+    load_configuration();
+
     # Discover modules
     discover_modules();
     
@@ -147,6 +158,7 @@ Options:
     -f, --force          Force deployment even if validations fail
     --format <fmt>       Output format: text, json, yaml
     -o, --output <path>  Show outputs for a specific module
+    --config-file <file> Script configuration file (default: config/manage-config.yaml)
     -h, --help           Show this help message
 
 Module Configuration (deploy.pl):
@@ -212,23 +224,77 @@ Output Files:
 HELP
 }
 
+sub load_configuration {
+    # Load configuration file
+    if (-f $config_file) {
+        eval {
+            $config = YAML::Tiny->read($config_file);
+            $config = $config->[0];  # YAML::Tiny returns array reference
+        };
+        if ($@) {
+            warn "${YELLOW}Warning: Error loading configuration file: $@${NC}\n";
+            warn "${YELLOW}Using default configuration${NC}\n";
+            set_default_config();
+        } else {
+            print "${GREEN}Configuration loaded from: $config_file${NC}\n" if $verbose;
+        }
+    } else {
+        set_default_config();
+        print "${YELLOW}Using default configuration (no config file found at $config_file)${NC}\n" if $verbose;
+    }
+}
+
+sub set_default_config {
+    $config = {
+        directories => {
+            environments => "envs",
+            projects => "projects",
+            modules => "modules",
+        }
+    };
+}
+
+sub get_config_value {
+    my ($path) = @_;
+    my @keys = split(/\./, $path);
+    my $value = $config;
+
+    foreach my $key (@keys) {
+        return undef unless defined $value && ref($value) eq 'HASH';
+        $value = $value->{$key};
+    }
+
+    return $value;
+}
+
 sub discover_modules {
     print "${CYAN}Discovering Terragrunt modules...${NC}\n" if $verbose;
-    
-    my @find_cmd = ('find', '.', '-name', 'terragrunt.hcl', '-not', '-path', '*/.terragrunt-cache/*');
+
+    # Get the environments directory from config, default to 'envs'
+    my $envs_dir = get_config_value("directories.environments") || 'envs';
+
+    # Build find command with configured directory
+    my @find_cmd = ('find', $envs_dir, '-name', 'terragrunt.hcl', '-not', '-path', '*/.terragrunt-cache/*');
+
+    # Check if environments directory exists
+    if (!-d $envs_dir) {
+        die "${RED}Error: Environments directory '$envs_dir' not found${NC}\n" .
+            "Please check your configuration file or specify --config-file\n";
+    }
+
     open(my $fh, '-|', @find_cmd) or die "Cannot run find: $!";
-    
+
     while (my $file = <$fh>) {
         chomp $file;
-        
+
         # Skip root terragrunt.hcl
         next if $file eq './terragrunt.hcl';
-        
+
         # Extract module path
         my $module_path = $file;
         $module_path =~ s/\/terragrunt\.hcl$//;
         $module_path =~ s/^\.\///;
-        
+
         $modules{$module_path} = {
             path => $module_path,
             has_config => -f "$module_path/deploy.pl",
@@ -239,16 +305,16 @@ sub discover_modules {
             skipped => 0,
             failed => 0,
         };
-        
+
         print "  Found: $module_path" if $verbose;
         print " [has deploy.pl]" if $verbose && $modules{$module_path}{has_config};
         print "\n" if $verbose;
     }
-    
+
     close $fh;
-    
+
     my $count = scalar keys %modules;
-    print "${GREEN}Discovered $count Terragrunt modules${NC}\n\n";
+    print "${GREEN}Discovered $count Terragrunt modules in '$envs_dir'${NC}\n\n";
 }
 
 sub load_module_configs {

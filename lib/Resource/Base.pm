@@ -343,17 +343,17 @@ sub cleanup_template_content {
     
     # Remove region-specific sections if no region
     if (!$self->{region_name}) {
-        $content =~ s/include "region".*?\}\n\n//s;
-        $content =~ s/.*region_vars.*\n//g;
-        $content =~ s/.*aws_region.*\n//g;
-        $content =~ s/\s*Region\s*=.*\n//g;
+        $content =~ s/include "region".*?\}\n\n/\n\n/s;
+        $content =~ s/.*region_vars.*\n/\n/g;
+        $content =~ s/.*aws_region.*\n/\n/g;
+        $content =~ s/\s*Region\s*=.*\n/\n/g;
     }
     
     # Remove zone-specific sections if no zone
     if (!$self->{zone_name}) {
-        $content =~ s/.*zone\s*=.*\n//g;
-        $content =~ s/\s*Zone\s*=.*\n//g;
-        $content =~ s/# Zone:.*\n//g;
+        $content =~ s/.*zone\s*=.*\n/\n/g;
+        $content =~ s/\s*Zone\s*=.*\n/\n/g;
+        $content =~ s/# Zone:.*\n/\n/g;
     }
     
     return $content;
