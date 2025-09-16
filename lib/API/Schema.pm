@@ -3,7 +3,7 @@ package API::Schema;
 use strict;
 use warnings;
 use POSIX qw(strftime);
-use JSON;
+use JSON ();
 
 # API Schema version for compatibility tracking
 our $SCHEMA_VERSION = "1.0";

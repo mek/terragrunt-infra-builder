@@ -20,7 +20,7 @@ use POSIX qw(strftime);
 use JSON;
 use API::Schema;
 use Util::Color;
-use YAML::Tiny;
+use Util::Config qw(get_config_value);
 
 # Global variables
 my %modules;
@@ -29,7 +29,7 @@ my $root_dir = abs_path('.');
 my %execution_times;
 my $start_time = time();
 my @modules_with_outputs;
-my $config_file = 'config/manage-config.yaml';
+my $config_file = undef;
 my $config;
 
 # Command line options
@@ -86,7 +86,10 @@ sub main {
     if ($config_file_override) {
         $config_file = $config_file_override;
     }
-    load_configuration();
+    $config = Util::Config->new( 
+      file => $config_file, 
+      verbose => $verbose
+    );
 
     # Discover modules
     discover_modules();
@@ -222,49 +225,6 @@ Output Files:
     Use the -o/--output option to view these outputs from the command line.
 
 HELP
-}
-
-sub load_configuration {
-    # Load configuration file
-    if (-f $config_file) {
-        eval {
-            $config = YAML::Tiny->read($config_file);
-            $config = $config->[0];  # YAML::Tiny returns array reference
-        };
-        if ($@) {
-            warn "${YELLOW}Warning: Error loading configuration file: $@${NC}\n";
-            warn "${YELLOW}Using default configuration${NC}\n";
-            set_default_config();
-        } else {
-            print "${GREEN}Configuration loaded from: $config_file${NC}\n" if $verbose;
-        }
-    } else {
-        set_default_config();
-        print "${YELLOW}Using default configuration (no config file found at $config_file)${NC}\n" if $verbose;
-    }
-}
-
-sub set_default_config {
-    $config = {
-        directories => {
-            environments => "envs",
-            projects => "projects",
-            modules => "modules",
-        }
-    };
-}
-
-sub get_config_value {
-    my ($path) = @_;
-    my @keys = split(/\./, $path);
-    my $value = $config;
-
-    foreach my $key (@keys) {
-        return undef unless defined $value && ref($value) eq 'HASH';
-        $value = $value->{$key};
-    }
-
-    return $value;
 }
 
 sub discover_modules {

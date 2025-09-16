@@ -23,6 +23,7 @@ use Resource::Factory;
 use Resource::Base;
 use Infrastructure::Factory;
 use Util::Color;
+use Util::Config qw(get_config_value);
 
 # Global variables
 my $workspace_root;
@@ -30,7 +31,7 @@ my $template_dir;
 my $verbose = 0;
 my $dry_run = 0;
 my $force = 0;
-my $config_file = "config/manage-config.yaml";
+my $config_file = undef;
 my $config;
 my $workspace_structure;
 
@@ -65,9 +66,14 @@ sub main {
     
     # Load configuration
     if ($config_file_override) {
-        $config_file = $config_file_override;
+      $config_file = $config_file_override;
     }
-    load_configuration();
+    # load_configuration();
+    $config = Util::Config->new( 
+      file => $config_file, 
+      verbose => $verbose
+    );
+
     
     # Validate workspace structure now that config is loaded
     validate_workspace_structure();
@@ -227,70 +233,6 @@ Examples:
 HELP
 }
 
-sub load_configuration {
-    # Load configuration file
-    if (-f $config_file) {
-        eval {
-            $config = YAML::Tiny->read($config_file);
-            $config = $config->[0];  # YAML::Tiny returns array reference
-        };
-        if ($@) {
-            die "${RED}Error loading configuration file: $@${NC}\n";
-        }
-        print "${GREEN}Configuration loaded from: $config_file${NC}\n" if $verbose;
-    } else {
-        # Use default configuration
-        $config = {
-            directories => {
-                environments => "envs",
-                projects => "projects",
-                modules => "modules",
-                environment_structure => {
-                    regional_placement => "direct",
-                    default_project => "h2g2",
-                }
-            },
-            templates => {
-                base_path => "templates",
-                environment => "env",
-                region => "region",
-                zone => "zone",
-                project => "project"
-            },
-            files => {
-                environment => "env.hcl",
-                region => "region.hcl",
-                project => "project.hcl",
-                terragrunt => "terragrunt.hcl"
-            },
-            zones => {
-                allowed => {
-                    "us-east-1" => "ohio",
-                    "us-west-2" => "oregon",
-                    "us-west-1" => "california",
-                    "eu-west-1" => "ireland",
-                    "eu-central-1" => "frankfurt",
-                    "ap-southeast-1" => "singapore",
-                    "ap-northeast-1" => "tokyo"
-                }
-            }
-        };
-        print "${YELLOW}Using default configuration (no config file found)${NC}\n" if $verbose;
-    }
-}
-
-sub get_config_value {
-    my ($path) = @_;
-    my @keys = split(/\./, $path);
-    my $value = $config;
-    
-    foreach my $key (@keys) {
-        return undef unless defined $value && ref($value) eq 'HASH';
-        $value = $value->{$key};
-    }
-    
-    return $value;
-}
 
 sub validate_workspace_structure {
     my $envs_dir = "$workspace_root/" . get_config_value("directories.environments");
