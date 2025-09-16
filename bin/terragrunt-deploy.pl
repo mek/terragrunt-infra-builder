@@ -91,6 +91,8 @@ sub main {
       verbose => $verbose
     );
 
+    Util::Config->set_instance($config);
+
     # Discover modules
     discover_modules();
     

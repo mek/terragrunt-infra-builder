@@ -59,6 +59,8 @@ sub main {
       verbose => $verbose
     );
 
+    Util::Config->set_instance($config);
+
     # Set template directory from config (unless overridden)
     if (!$template_dir) {
         $template_dir = "$workspace_root/" . get_config_value("templates.base_path");

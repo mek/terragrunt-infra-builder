@@ -73,6 +73,7 @@ sub main {
       verbose => $verbose
     );
 
+    Util::Config->set_instance($config);
     
     # Validate workspace structure now that config is loaded
     validate_workspace_structure();

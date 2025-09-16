@@ -93,6 +93,18 @@ sub get_config_value {
   $instance->_get($path); 
 }
 
+sub set_instance {
+  my ($class, $new_instance) = @_;
+
+  if (defined $new_instance && !$new_instance->isa(__PACKAGE__)) {
+    croak "Argument to set_instance() must be an instance of " .  __PACKAGE__;
+  }
+
+  $instance = $new_instance;
+
+  return $instance;
+}
+
 sub _get {
   my ($self,$path) = @_;
   my @keys = split(/\./, $path);
