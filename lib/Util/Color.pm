@@ -1,7 +1,7 @@
 package Util::Color;
 #
 # Color utility module for consistent terminal output
-# 
+#
 # Copyright (c) 2017-2025 Mat Kovach <mek@mek.cc>
 # Licensed under the MIT License - see LICENSE file for details
 
@@ -11,27 +11,27 @@ use Exporter 'import';
 
 # Export color constants and utility functions
 our @EXPORT = qw(
-    $GREEN $YELLOW $RED $BLUE $CYAN $MAGENTA $BOLD $NC
-    colored colorize
+  $GREEN $YELLOW $RED $BLUE $CYAN $MAGENTA $BOLD $NC
+  colored colorize
 );
 
 # ANSI color codes
 our $GREEN   = "\033[0;32m";
-our $YELLOW  = "\033[0;33m";  
+our $YELLOW  = "\033[0;33m";
 our $RED     = "\033[0;31m";
 our $BLUE    = "\033[0;34m";
 our $CYAN    = "\033[0;36m";
 our $MAGENTA = "\033[0;35m";
 our $BOLD    = "\033[1m";
-our $NC      = "\033[0m";     # No Color
+our $NC      = "\033[0m";      # No Color
 
 # Utility function to colorize text
 # Usage: colored('text', 'red') or colored('text', $RED)
 sub colored {
-    my ($text, $color) = @_;
-    
+    my ( $text, $color ) = @_;
+
     # Handle color name strings
-    if (defined $color && $color !~ /^\033/) {
+    if ( defined $color && $color !~ /^\033/ ) {
         my %color_map = (
             'green'   => $GREEN,
             'yellow'  => $YELLOW,
@@ -41,9 +41,9 @@ sub colored {
             'magenta' => $MAGENTA,
             'bold'    => $BOLD,
         );
-        $color = $color_map{lc($color)} || '';
+        $color = $color_map{ lc($color) } || '';
     }
-    
+
     return defined $color ? "$color$text$NC" : $text;
 }
 
@@ -54,6 +54,7 @@ sub colorize {
 
 # Check if colors should be disabled (for testing or non-terminal output)
 sub should_use_colors {
+
     # Disable colors if:
     # 1. NO_COLOR environment variable is set
     # 2. Output is not to a terminal
@@ -64,7 +65,8 @@ sub should_use_colors {
 
 # Initialize color support - call this to potentially disable colors
 sub init_colors {
-    if (!should_use_colors()) {
+    if ( !should_use_colors() ) {
+
         # Disable all colors
         $GREEN = $YELLOW = $RED = $BLUE = $CYAN = $MAGENTA = $BOLD = $NC = '';
     }

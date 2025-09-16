@@ -9,9 +9,9 @@ use base 'Resource::Base';
 
 # Constructor
 sub new {
-    my ($class, %args) = @_;
+    my ( $class, %args ) = @_;
     my $self = $class->SUPER::new(%args);
-    
+
     return $self;
 }
 
@@ -23,28 +23,28 @@ sub get_type {
 # Override validation if needed
 sub validate {
     my $self = shift;
-    
+
     # Add eks-specific validation here
     # Examples:
     # - Check required parameters
     # - Validate resource naming conventions
     # - Verify dependencies exist
-    
+
     return $self->SUPER::validate();
 }
 
 # Override post-creation hook if needed
 sub post_create {
     my $self = shift;
-    
+
     print "  eks resource created successfully\n" if $self->{verbose};
-    
+
     # Add eks-specific post-creation tasks here
     # Examples:
     # - Generate additional configuration files
     # - Set up dependencies
     # - Create helper scripts
-    
+
     return $self->SUPER::post_create();
 }
 
