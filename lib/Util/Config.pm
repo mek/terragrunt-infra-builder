@@ -3,13 +3,16 @@ package Util::Config;
 use strict;
 use warnings;
 use Carp;
+use Exporter 'import';
 
 use YAML::Tiny;
 use Util::Color;
 
-use Sub::Exporter -setup => {
-  exports => ['get_config_value'],
-};
+# use Sub::Exporter -setup => {
+#  exports => ['get_config_value'],
+#};
+
+our @EXPORT = qw(get_config_value);
 
 my $instance;
 
@@ -104,3 +107,82 @@ sub _get {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Util::Config - A module for managing configuration data using YAML files.
+
+=head1 SYNOPSIS
+
+  use Util::Config;
+  
+  # Retrieve a configuration value using a dot-separated path
+  my $value = get_config_value('directories.environments');
+
+=head1 DESCRIPTION
+
+The Util::Config module provides an interface to manage configuration settings
+stored in YAML files. It supports loading configuration from a specified file
+or a default location and offers convenient methods to retrieve configuration
+values.
+
+=head1 METHODS
+
+=head2 new
+
+  my $config = Util::Config->new(file => 'path/to/config.yaml', verbose => 1);
+
+Creates a new Util::Config instance. Accepts the following parameters:
+
+=over 4
+
+=item B<file>
+
+Specifies the configuration file to load. Defaults to 'config/manage-config.yaml'.
+
+=item B<verbose>
+
+Enables verbose output if set to a true value.
+
+=back
+
+=head2 get_config_value
+
+  my $value = get_config_value('path.to.value');
+
+Retrieves a configuration value using a dot-separated path. Automatically handles
+loading the configuration from the specified file or default location.
+
+=head1 CONFIGURATION STRUCTURE
+
+=over 4
+
+=item B<directories>
+
+Contains directory settings such as environments, projects, and modules.
+
+=item B<templates>
+
+Specifies template paths used within the configuration.
+
+=item B<files>
+
+Defines standard file names used in various infrastructure components.
+
+=item B<zones>
+
+Lists allowed zones and their shorthand identifiers for various AWS regions.
+
+=back
+
+=head1 AUTHOR
+
+Copyright (c) 2017-2025 Mat Kovach <mek@mek.cc>
+
+=head1 LICENSE
+
+Licensed under the MIT License.
+
+=cut

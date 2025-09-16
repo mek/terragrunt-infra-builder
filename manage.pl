@@ -17,13 +17,12 @@ use Getopt::Long;
 use Cwd 'abs_path';
 use Data::Dumper;
 use JSON;
-use YAML::Tiny;
 use POSIX qw(strftime);
 use Resource::Factory;
 use Resource::Base;
 use Infrastructure::Factory;
 use Util::Color;
-use Util::Config qw(get_config_value);
+use Util::Config;
 
 # Global variables
 my $workspace_root;

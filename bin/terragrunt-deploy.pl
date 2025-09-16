@@ -20,7 +20,7 @@ use POSIX qw(strftime);
 use JSON;
 use API::Schema;
 use Util::Color;
-use Util::Config qw(get_config_value);
+use Util::Config;
 
 # Global variables
 my %modules;
@@ -1015,3 +1015,239 @@ sub get_resource_category {
 
 # Run main
 main();
+
+__END__
+
+=head1 NAME
+
+terragrunt-deploy.pl - Terragrunt Deployment Orchestration Script
+
+=head1 SYNOPSIS
+
+    terragrunt-deploy.pl [OPTIONS]
+    terragrunt-deploy.pl [directory] [OPTIONS]
+
+=head1 DESCRIPTION
+
+The Terragrunt Intelligent Deployment System is used for automating the deployment
+of infrastructure modules managed by Terragrunt. It provides capabilities
+such as module discovery, dependency management, parallel execution, and more.
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-d, --dir> I<path>
+
+Deploy only modules in the specified directory.
+
+=item B<-t, --tag> I<tag>
+
+Deploy only modules with the specified tag.
+
+=item B<--dry-run>
+
+Show what would be deployed without executing any changes.
+
+=item B<-l, --list>
+
+List all modules and their metadata.
+
+=item B<-p, --parallel>
+
+Deploy independent modules in parallel.
+
+=item B<--destroy>
+
+Run terragrunt destroy instead of apply.
+
+=item B<--plan>
+
+Run terragrunt plan only.
+
+=item B<--init>
+
+Run terragrunt init only.
+
+=item B<-v, --verbose>
+
+Enable verbose output.
+
+=item B<--docs>
+
+Show module documentation.
+
+=item B<--validate>
+
+Validate module configurations only.
+
+=item B<-f, --force>
+
+Force deployment even if validations fail.
+
+=item B<--format> I<fmt>
+
+Output format: text, json, yaml.
+
+=item B<-o, --output> I<path>
+
+Show outputs for a specific module.
+
+=item B<--config-file> I<file>
+
+Specify the script configuration file (default: config/manage-config.yaml).
+
+=item B<-h, --help>
+
+Show this help message.
+
+=back
+
+=head1 MODULE CONFIGURATION
+
+Each deployable directory can contain a deploy.pl file that returns a Deploy::Module
+object with the following properties:
+
+=over 4
+
+=item B<name>
+
+Module name.
+
+=item B<description>
+
+Module description.
+
+=item B<dependencies>
+
+Array of module paths this depends on.
+
+=item B<tags>
+
+Hash of tags for filtering.
+
+=item B<priority>
+
+Deployment priority (0-100).
+
+=item B<timeout>
+
+Deployment timeout in seconds.
+
+=item B<pre_deploy>
+
+Code reference to run before deployment.
+
+=item B<post_deploy>
+
+Code reference to run after deployment.
+
+=item B<validate>
+
+Code reference to validate before deployment.
+
+=item B<skip_if>
+
+Code reference to determine if module should be skipped.
+
+=item B<retry>
+
+Number of retry attempts.
+
+=item B<parallel_safe>
+
+Indicates if the module can be deployed in parallel.
+
+=item B<critical>
+
+Stop all deployment if this fails.
+
+=item B<docs>
+
+Extended documentation.
+
+=item B<owner>
+
+Module owner.
+
+=item B<team>
+
+Responsible team.
+
+=back
+
+=head1 EXAMPLES
+
+=over 4
+
+=item B<Deploy all modules>
+
+    ./terragrunt-deploy.pl
+
+=item B<Deploy only production modules (using positional argument)>
+
+    ./terragrunt-deploy.pl envs/prod/h2g2/us-west-2
+
+=item B<Deploy only production modules (using option)>
+
+    ./terragrunt-deploy.pl -d envs/prod
+
+=item B<Initialize modules>
+
+    ./terragrunt-deploy.pl envs/prod/h2g2/_global --init
+
+=item B<Deploy with plan only>
+
+    ./terragrunt-deploy.pl envs/prod/h2g2/us-west-2 --plan
+
+=item B<Deploy only modules tagged as 'infrastructure'>
+
+    ./terragrunt-deploy.pl -t type=infrastructure
+
+=item B<Validate all module configurations>
+
+    ./terragrunt-deploy.pl --validate
+
+=item B<Show module documentation>
+
+    ./terragrunt-deploy.pl --docs
+
+=item B<Show outputs for a specific module>
+
+    ./terragrunt-deploy.pl -o envs/prod/h2g2/us-west-2/z2wa/eks
+
+=back
+
+=head1 OUTPUT FILES
+
+After successful apply operations, the script automatically creates output.json
+files in each module directory containing:
+
+=over 4
+
+=item *
+
+Module metadata (name, path, description).
+
+=item *
+
+Deployment timestamp and operation details.
+
+=item *
+
+Terragrunt outputs in JSON format.
+
+=back
+
+These files are used by API servers to provide infrastructure status. Use the
+-o/--output option to view these outputs from the command line.
+
+=head1 AUTHOR
+
+Copyright (c) 2017-2025 Mat Kovach <mek@mek.cc>
+
+=head1 LICENSE
+
+Licensed under the MIT License - see LICENSE file for details.
+
+=cut

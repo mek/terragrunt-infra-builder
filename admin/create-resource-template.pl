@@ -13,12 +13,11 @@ use File::Basename;
 use Getopt::Long;
 use POSIX qw(strftime);
 use JSON;
-use YAML::Tiny;
 use Cwd 'abs_path';
 use lib '../lib';
 use Resource::Factory;
 use Util::Color;
-use Util::Config qw(get_config_value);
+use Util::Config;
 
 # Global variables
 my $workspace_root;
